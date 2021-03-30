@@ -105,19 +105,6 @@ CREATE TABLE EventLocation (
                           ON UPDATE CASCADE,
 );
 
-CREATE TABLE Comment (
-    Postdate  TIMESTAMP PRIMARY KEY NOT NULL,
-    Text      TEXT                  NOT NULL,
-    UserID    INT                   NOT NULL,
-    EventID   INT                   NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES User 
-                    ON DELETE CASCADE
-                    ON UPDATE CASCADE,
-    FOREIGN KEY (EventID) REFERENCES Event 
-                    ON DELETE CASCADE
-                    ON UPDATE CASCADE,
-);
-
 CREATE TABLE Organizes (
     RSOID           INT NOT NULL,
     EventID         INT NOT NULL,
@@ -129,12 +116,45 @@ CREATE TABLE Organizes (
                     ON UPDATE CASCADE,
 );
 
+CREATE TABLE Comment (
+    CommentPostdate TIMESTAMP PRIMARY KEY NOT NULL,
+    Text            TEXT                  NOT NULL,
+    Rating          REAL,
+);
+
+CREATE TABLE CommentedOn (
+    UserID          INT                   NOT NULL,
+    EventID         INT                   NOT NULL,
+    CommentPostdate TIMESTAMP             NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES User 
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE,
+    FOREIGN KEY (EventID) REFERENCES Event 
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE,
+    FOREIGN KEY (CommentPostdate) REFERENCES Comment 
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE,
+);
+
+CREATE TABLE Rated (
+    UserID          INT                   NOT NULL,
+    CommentPostdate TIMESTAMP             NOT NULL,
+    Rating          INT                   NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES User 
+                        ON DELETE CASCADE
+                        ON UPDATE CASCADE,
+    FOREIGN KEY (CommentPostdate) REFERENCES Comment 
+                        ON DELETE CASCADE
+                        ON UPDATE CASCADE,
+);
+
 CREATE EventTag (
     EventTagID   INT PRIMARY KEY NOT NULL,
     EventTagName TEXT            NOT NULL
 );
 
-CREATE TABLE EventCategory (
+CREATE TABLE HasTag (
     EventID    INT NOT NULL,
     EventTagID INT NOT NULL,
     FOREIGN KEY (EventID) REFERENCES Event 
