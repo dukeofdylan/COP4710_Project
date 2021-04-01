@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post" action="{% url 'create_university' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if form.errors %}
+        {{ form.errors }}
+    {% endif %}
+    <input type="submit" value="Create university" />
+</form>
+
+{% endblock %}

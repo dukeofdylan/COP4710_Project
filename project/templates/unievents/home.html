@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{user.username}}'s home</h1>
+    <p> id: {{ user.id }}, email: {{ user.email }} </p>
+    <button href="create_event">Create event</button>
+    <button href="create_university">Create university</button>
+{% endblock %}
