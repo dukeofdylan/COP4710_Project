@@ -84,7 +84,8 @@ DATABASES = {
     }
 }
 
-MEDIA_ROOT = BASE_DIR / "db_media"
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 
 # Password validation

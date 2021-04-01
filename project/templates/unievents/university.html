@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{university.name}}</h2>
+    id: {{ university.university_id }}</br>
+    email_domain: {{ university.email_domain }}</br>
+    student count: {{ university.student_count }}</br>
+    description: {{ university.description }}</br>
+    Coordinates: {{ university.coordinates }}</br>
+
+    Avatar: </br><img src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/>
+{% endblock %}
