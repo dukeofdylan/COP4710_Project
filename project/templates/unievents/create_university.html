@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form method="post" action="{% url 'create_university' %}">
+<form method="post" action="{% url 'create_university' %}" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     {% if form.errors %}

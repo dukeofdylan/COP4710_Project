@@ -1,3 +1,4 @@
+# GDAL and six were necessary for maps
 """
 Django settings for cop4710 project.
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",
     "unievents",
+    "mapwidgets",
 ]
 
 MIDDLEWARE = [
@@ -82,7 +84,7 @@ DATABASES = {
     }
 }
 
-MEDIA_ROOT = "/db_media/"
+MEDIA_ROOT = BASE_DIR / "db_media"
 
 
 # Password validation
@@ -124,3 +126,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "lib_static/"
+STATICFILES_DIRS = (BASE_DIR / "static",)
+
+MAP_WIDGETS = {
+    "GooglePointFieldWidget": (
+        ("zoom", 15),
+        ("mapCenterLocationName", "orlando"),
+        ("GooglePlaceAutocompleteOptions", {"componentRestrictions": {"country": "us"}}),
+        ("markerFitZoom", 12),
+    ),
+    "GOOGLE_MAP_API_KEY": "AIzaSyDwEP1jOwOdLWOXVJJ1tBgltp50nmNUAZk",
+}

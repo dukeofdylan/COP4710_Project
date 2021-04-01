@@ -17,7 +17,7 @@ from django.urls import path
 from unievents.views import home_view, CreateUniversityView
 
 urlpatterns = [
-    path("", home_view),
+    path("", home_view, name="home"),
     path("university/<pk>/", home_view),
     path("rso/<pk>/", home_view),
     path("event/<pk>/", home_view),

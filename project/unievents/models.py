@@ -19,11 +19,14 @@ def uni_image_upload_to(instance, filename):
 
 class University(models.Model):
     university_id = models.AutoField(db_column="university_id", primary_key=True)  #
-    student_count = models.IntegerField(db_column="student_count")  # TODO: make it a view or make a trigger for it
+    student_count = models.IntegerField(
+        db_column="student_count", default=0
+    )  # TODO: make it a view or make a trigger for it
     name = models.TextField(db_column="name", blank=True)  #
     description = models.TextField(db_column="description", blank=True, null=True)  #
-    avatar_image = models.ImageField(db_column="avatar_image", blank=True, null=True, upload_to=uni_image_upload_to)
+    avatar_image = models.ImageField(db_column="avatar_image", blank=True, null=False, upload_to=uni_image_upload_to)
     email_domain = models.TextField(db_column="email_domain")  #
+    coordinates = models.TextField()
 
     class Meta:
         db_table = "university"

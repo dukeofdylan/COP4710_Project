@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 django = "*"
 pillow = "*"
+django-map-widgets = "*"
+six = "*"
 
 [dev-packages]
 black = "*"
