@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<form method="post" action="{% url 'create_university' %}" enctype="multipart/form-data">
+{{ location_form.media }}
+<form method="post" action="{% url 'universities_create' %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    {% if form.errors %}
-        {{ form.errors }}
-    {% endif %}
+    {{ location_form.as_p }}
+    {{ university_form.as_p }}
     <input type="submit" value="Create university" />
 </form>
 

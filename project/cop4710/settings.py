@@ -127,8 +127,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "lib_static/"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATIC_ROOT = BASE_DIR / "static/"
+STATICFILES_DIRS = ()
 
 MAP_WIDGETS = {
     "GooglePointFieldWidget": (
@@ -137,5 +137,26 @@ MAP_WIDGETS = {
         ("GooglePlaceAutocompleteOptions", {"componentRestrictions": {"country": "us"}}),
         ("markerFitZoom", 12),
     ),
+    "GoogleStaticMapWidget": (
+        ("zoom", 15),
+        ("size", "480x480"),
+        ("scale", ""),
+        ("format", ""),
+        ("maptype", ""),
+        ("path", ""),
+        ("visible", ""),
+        ("style", ""),
+        ("language", ""),
+        ("region", ""),
+    ),
+    "GoogleStaticMapMarkerSettings": (
+        ("size", "normal"),
+        ("color", ""),
+        ("icon", ""),
+    ),
+    "LANGUAGE": "en",
+    "GOOGLE_MAP_API_SIGNATURE": "",
     "GOOGLE_MAP_API_KEY": "AIzaSyDwEP1jOwOdLWOXVJJ1tBgltp50nmNUAZk",
 }
+
+LOGIN_REDIRECT_URL = ""

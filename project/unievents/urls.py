@@ -14,16 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from unievents.views import UniversityView, home_view, CreateUniversityView
-from django.conf.urls.static import static
-from cop4710 import settings
+from unievents.views import UniversityView, UniversityListView, home_view, create_university_view
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path("", home_view, name="home"),
-    path("university/<pk>/", UniversityView.as_view()),
-    path("rso/<pk>/", home_view),
-    path("event/<pk>/", home_view),
-    path("create_university/", CreateUniversityView.as_view(), name="create_university"),
-    path("create_rso/<int:university_id>/", home_view),
-    path("create_event/<int:rso_id>/", home_view),
+    path("", RedirectView.as_view(pattern_name="home")),
+    path("home", home_view, name="home"),
+    path("university/create", create_university_view, name="universities_create"),
+    path("university/list", UniversityListView.as_view(), name="universities_list"),
+    path("university/<pk>/", UniversityView.as_view(), name="universities_view"),
+    path("event/<pk>/", home_view, name="events_view"),
+    path("rso/<int:university_id>/", home_view, name="rso_create"),
+    path("rso/<pk>/", home_view, name="rso_view"),
+    path("event/<int:rso_id>/", home_view, name="events_create"),
 ]

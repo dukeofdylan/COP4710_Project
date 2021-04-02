@@ -17,10 +17,9 @@ from django.urls import path
 from accounts.views import SignupView, LoginView, LogoutView, ProfileView, redirect_to_default_user_profile
 
 urlpatterns = [
-    path("signup/", SignupView.as_view(), name="signup"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
-    path("profile/<pk>/", ProfileView.as_view()),
-    path("profile/", redirect_to_default_user_profile),
+    path("signup/", SignupView.as_view(), name="accounts_signup"),
+    path("login/", LoginView.as_view(), name="accounts_login"),
+    path("logout/", LogoutView.as_view(), name="accounts_logout"),
+    path("<pk>/", ProfileView.as_view(), name="accounts_view"),
     path("", redirect_to_default_user_profile),
 ]

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form method="post" action="{% url 'signup' %}">
+<form method="post" action="{% url 'accounts_signup' %}">
     {% csrf_token %}
     <table>
         <tr>

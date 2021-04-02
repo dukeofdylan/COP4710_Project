@@ -5,8 +5,7 @@
     id: {{ university.university_id }}</br>
     email_domain: {{ university.email_domain }}</br>
     student count: {{ university.student_count }}</br>
-    description: {{ university.description }}</br>
-    Coordinates: {{ university.coordinates }}</br>
-
-    Avatar: </br><img src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/>
+    description: {{ university.description|linebreaks }}</br>
+    Location: </br> <img src="{{ university.location.image.url }}" alt="Location has not loaded"/></br> 
+    Avatar: </br><img style="width:100%;max-width:200px;" src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/> 
 {% endblock %}

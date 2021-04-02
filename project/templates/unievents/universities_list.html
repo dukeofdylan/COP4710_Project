@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Universities</h1>
+<ul>
+{% for uni in object_list %}
+    <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
+{% empty %}
+    <li>No universities found.</li>
+{% endfor %}
+</ul>
+{% endblock %}

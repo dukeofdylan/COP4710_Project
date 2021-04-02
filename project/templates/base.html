@@ -5,10 +5,19 @@
     <title>RSOMaker</title>
     {% load static %}
     <script type="text/javascript" src="{% static 'jquery-3.6.0.min.js' %}"></script> 
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     {{ form.media }}
 </head>
 
 <body>
+    <input type="button" id="top" onclick="location.href='{% url 'home' %}';" value="Home"/>
+    {% if user.is_authenticated %}
+        <input type="button" id="top" onclick="location.href='{% url 'accounts_view' user.id %}';" value="My account"/>
+        <input type="button" id="top" onclick="location.href='{% url 'accounts_logout' %}';" value="Logout"/>
+    {% else %}
+        <input type="button" id="top" onclick="location.href='{% url 'accounts_login' %}';" value="Login"/>
+        <input type="button" id="top" onclick="location.href='{% url 'accounts_signup' %}';" value="Sign up"/>
+    {% endif %}
     {% block content %}{% endblock content %}
 </body>
 
