@@ -1,11 +1,12 @@
-from os import makedirs
+from typing import cast
 
 from django.core.exceptions import ValidationError
-from unievents.models import Location, University
+from django.db.models.query import QuerySet
+from accounts.models import User
+from unievents.models import Location, RSO, University
 from django import forms
 from mapwidgets.widgets import GooglePointFieldWidget, GoogleStaticMapWidget
-from django.forms.models import inlineformset_factory
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
 
 from unievents.util import download
 from cop4710.settings import MEDIA_ROOT
@@ -28,7 +29,7 @@ class CreateLocationForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        point = GEOSGeometry(self.cleaned_data["point"])
+        point = cast(Point, GEOSGeometry(self.cleaned_data["point"]))
         instance.longitude = point.x
         instance.latitude = point.y
         existing_locations = self.Meta.model.objects.filter(longitude=point.x, latitude=point.y)
@@ -56,7 +57,6 @@ class CreateUniversityForm(forms.ModelForm):
     def save(self, location, commit=True):
         instance = super().save(commit=False)
         instance.location_id = location.location_id
-
         if commit:
             instance.save()
         return instance
@@ -69,3 +69,44 @@ class CreateUniversityForm(forms.ModelForm):
             return image
         else:
             raise ValidationError("Couldn't read uploaded image")
+
+
+class ModelMultipleChoiceFieldWithMinNumberOfChoices(forms.ModelMultipleChoiceField):
+    def __init__(self, min_choices, *args, **kwargs):
+        self.min_choices = min_choices
+        super().__init__(*args, **kwargs)
+
+    def clean(self, value):
+        if len(value) < self.min_choices:
+            raise ValidationError(f"{len(value)} choices provided. {self.min_choices} required.")
+        return super().clean(value)
+
+
+class CreateRSOForm(forms.ModelForm):
+    members = ModelMultipleChoiceFieldWithMinNumberOfChoices(
+        min_choices=4,
+        widget=forms.widgets.CheckboxSelectMultiple,
+        help_text="Pick 4 more students to create the RSO.",
+        queryset=None,
+    )
+    name = forms.fields.CharField(widget=forms.TextInput)
+
+    class Meta:
+        model = RSO
+        fields = ("name", "description", "members")
+
+    def __init__(self, future_admin, university_students, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.future_admin = future_admin
+        self.fields["members"].queryset = university_students
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.admin_id = self.future_admin.id
+        instance.university_id = self.future_admin.university_id
+        if commit:
+            instance.save()
+            # Very important for saving members
+            self.cleaned_data["members"] |= User.objects.filter(pk=self.future_admin.id)
+            self.save_m2m()
+        return instance

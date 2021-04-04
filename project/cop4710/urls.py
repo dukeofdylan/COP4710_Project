@@ -20,4 +20,6 @@ from cop4710 import settings
 urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("", include("unievents.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore

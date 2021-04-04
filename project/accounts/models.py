@@ -12,3 +12,6 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_superadmin = models.BooleanField(default=False, null=False)
+    university = models.ForeignKey(
+        "unievents.university", on_delete=models.DO_NOTHING, related_name="students", null=True
+    )

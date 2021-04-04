@@ -2,4 +2,7 @@ from django.apps import AppConfig
 
 
 class UnieventsConfig(AppConfig):
-    name = 'unievents'
+    name = "unievents"
+
+    def ready(self):
+        import unievents.signals

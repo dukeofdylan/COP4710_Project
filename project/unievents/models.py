@@ -1,12 +1,13 @@
 # TODO: Add unique constraints
 from django.db import models
+from django.db.models.manager import Manager
 from accounts.models import User
 
 from pathlib import Path
 
 
 class GetFieldsMixin:
-    def get_fields(self):
+    def get_fields(self: models.Model):  # type: ignore
         return [(field.verbose_name, field.value_from_object(self)) for field in self.__class__._meta.fields]
 
 
@@ -35,6 +36,7 @@ class University(GetFieldsMixin, models.Model):
     email_domain = models.TextField(db_column="email_domain")
     location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=False)
     max_avatar_size = 5 * 1024 * 1024
+    students: Manager
 
     class Meta:
         db_table = "university"
@@ -51,19 +53,13 @@ class Studies_at(GetFieldsMixin, models.Model):
 class RSO(GetFieldsMixin, models.Model):
     rso_id = models.AutoField(db_column="rso_id", primary_key=True)
     name = models.TextField(db_column="name")
-    description = models.TextField(db_column="description", null=True)
+    description = models.TextField(db_column="description", null=False, default="")
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
+    university = models.ForeignKey(University, on_delete=models.CASCADE, null=False, related_name="rsos")
+    members = models.ManyToManyField(User, related_name="rso_memberships")
 
     class Meta:
         db_table = "rso"
-
-
-class Registeredat(GetFieldsMixin, models.Model):
-    rso = models.ForeignKey(RSO, on_delete=models.CASCADE)
-    university = models.ForeignKey(University, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "registered_at"
 
 
 class Member_of(GetFieldsMixin, models.Model):
@@ -93,7 +89,6 @@ class Event(GetFieldsMixin, models.Model):
 
 
 class Comment(GetFieldsMixin, models.Model):
-    # This field type is a guess.
     comment_postdate = models.DateTimeField(db_column="comment_postdate", primary_key=True, auto_now_add=True)
     text = models.TextField(db_column="text", blank=True)
     rating = models.IntegerField(db_column="rating", null=True)
@@ -107,7 +102,7 @@ class Comment(GetFieldsMixin, models.Model):
 class Event_tag(GetFieldsMixin, models.Model):
     event_tag_id = models.AutoField(db_column="event_tag_id", primary_key=True)
     event_tag_name = models.TextField(db_column="event_tag_name")
-    event = models.ManyToManyField(Event)
+    event = models.ManyToManyField(Event, related_name="tags")
 
     class Meta:
         db_table = "event_tag"

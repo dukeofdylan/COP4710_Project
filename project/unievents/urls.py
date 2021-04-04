@@ -14,7 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from unievents.views import UniversityView, UniversityListView, home_view, create_university_view
+from unievents.views import (
+    RSOView,
+    RSOListView,
+    UniversityView,
+    UniversityListView,
+    create_rso_view,
+    home_view,
+    create_university_view,
+)
 from django.views.generic import RedirectView
 
 urlpatterns = [
@@ -24,7 +32,8 @@ urlpatterns = [
     path("university/list", UniversityListView.as_view(), name="universities_list"),
     path("university/<pk>/", UniversityView.as_view(), name="universities_view"),
     path("event/<pk>/", home_view, name="events_view"),
-    path("rso/<int:university_id>/", home_view, name="rso_create"),
-    path("rso/<pk>/", home_view, name="rso_view"),
-    path("event/<int:rso_id>/", home_view, name="events_create"),
+    path("rso/<int:university_id>/create/", create_rso_view, name="rso_create"),
+    path("rso/<int:university_id>/list", RSOListView.as_view(), name="rso_list"),
+    path("rso/<int:university_id>/<pk>/", RSOView.as_view(), name="rso_view"),
+    path("event/<int:rso_id>/create", home_view, name="events_create"),
 ]
