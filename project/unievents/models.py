@@ -62,14 +62,6 @@ class RSO(GetFieldsMixin, models.Model):
         db_table = "rso"
 
 
-class Member_of(GetFieldsMixin, models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rso = models.ForeignKey(RSO, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "member_of"
-
-
 class Event(GetFieldsMixin, models.Model):
     event_id = models.AutoField(db_column="event_id", primary_key=True)
     summary = models.TextField(db_column="summary")

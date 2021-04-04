@@ -5,4 +5,4 @@ class UnieventsConfig(AppConfig):
     name = "unievents"
 
     def ready(self):
-        import unievents.signals
+        from . import signals

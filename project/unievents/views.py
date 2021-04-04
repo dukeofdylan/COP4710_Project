@@ -1,5 +1,9 @@
+from typing import Any, Type
+from django.db import models
+from django.db.models.base import ModelBase
 from django.shortcuts import redirect, render
 from django.http import HttpRequest
+from django.views.generic.base import ContextMixin, View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from accounts.views import login_required, super_admin_required
@@ -30,41 +34,59 @@ def create_university_view(request):
     location_form = CreateLocationForm(request.POST or None)
     context = {"university_form": university_form, "location_form": location_form}
     if request.method == "GET":
-        return render(request, "unievents/create_university.html", context)
+        return render(request, "unievents/university_create.html", context)
     elif request.method == "POST":
         if university_form.is_valid() and location_form.is_valid():
             location = location_form.save()
             university_form.save(location)
             return redirect("home")
         else:
-            return render(request, "unievents/create_university.html", context)
+            return render(request, "unievents/university_create.html", context)
     else:
-        return render(request, "unievents/create_university.html", context)
+        return render(request, "unievents/university_create.html", context)
 
 
 class UniversityView(LoginRequiredMixin, DetailView):
-    template_name = "unievents/university.html"
+    template_name = "unievents/university_view.html"
     model = University
 
 
 class UniversityListView(LoginRequiredMixin, ListView):
-    template_name = "unievents/universities_list.html"
+    template_name = "unievents/university_list.html"
     model = University
 
 
-class UniversityInContextMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # type: ignore
-        context["university"] = University.objects.get(pk=self.kwargs.pop("university_id"))  # type: ignore
-        return context
+def add_to_context_decorator(**models: Type[models.Model]):
+    """ @decorator(model1, model2, model3_pk_name=model3, ...) """
+
+    def arghandler(cls: Type[ContextMixin]):
+        def inner(self, **kwargs: Any) -> Any:
+            context = super(type(self), self).get_context_data(**kwargs)
+            for kwargname, model in models.items():
+                context[model._meta.db_table] = model.objects.get(pk=self.kwargs[kwargname])
+            return context
+
+        cls.get_context_data = inner
+        return cls
+
+    return arghandler
 
 
-class RSOView(UniversityInContextMixin, LoginRequiredMixin, DetailView):
+# class UniversityInContextMixin:
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)  # type: ignore
+#         context["university"] = University.objects.get(pk=self.kwargs.pop("university_id"))  # type: ignore
+#         return context
+
+
+@add_to_context_decorator(university_id=University)
+class RSOView(LoginRequiredMixin, DetailView):
     template_name = "unievents/rso_view.html"
     model = RSO
 
 
-class RSOListView(UniversityInContextMixin, LoginRequiredMixin, ListView):
+@add_to_context_decorator(university_id=University)
+class RSOListView(LoginRequiredMixin, ListView):
     template_name = "unievents/rso_list.html"
     model = RSO
 

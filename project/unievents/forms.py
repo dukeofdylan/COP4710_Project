@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Type, cast
 
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
@@ -41,6 +41,11 @@ class CreateLocationForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+def add_location_form_decorator(cls: Type[forms.ModelForm]):
+    def save(self, commit=True):
+        pass
 
 
 class CreateUniversityForm(forms.ModelForm):
