@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{user.username}}'s home</h1>
+    <p> id: {{ user.id }} </p>
+    <p> email: {{ user.email }} </p>
+    
+    <input type="button" onclick="location.href='{% url 'universities_list' %}';" value="Universities" />
+{% endblock %}

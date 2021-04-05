@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{event.summary}}</h2>
+    <p>ID: {{ event.event_id }}</p>
+    <p>Privacy Level: {{ event.privacy_level }}</p>
+    <p>Description: {{ event.description|linebreaks }}</p>
+    <p>Contact Phone: {{ event.phone }}</p>
+    <p>Contact Email: {{ event.email }}</p>
+    <p>Location: </br> <img src="{{ event.location.image.url }}" alt="Location has not loaded"/></p>
+    <p>Start time: {{event.dtstart.isoformat}}</p>
+    <p>End time: {{ event.dtend.isoformat }}</p>
+    <p>RRULE:FREQ={{event.freq}};UNTIL={{event.until.isoformat}};BYDAY={{event.byday}}</p>
+    
+    <h3> Comments </h3>
+    <ul>
+        <form method="post" action="{% url 'comment_create' university.university_id rso.rso_id event.event_id %}">
+            {% csrf_token %}
+            <div class="comment-container">
+                <input name="text" type="text" id="id_comment-text" required>
+                <span class="comment-time-right">{{comment.postdate.isoformat}}</span>
+                <input type="submit" value="Comment on event" />
+            </div>
+        </form>
+        </br>
+        {% for comment in event.comments.all %}
+            <div class="comment-container">
+                <a href="{% url 'accounts_view' comment.user.id %}"> {{comment.user.username}} </a>
+                <p>{{comment.text}}</p>
+                <span class="comment-time-right">{{comment.postdate.isoformat}}</span>
+            </div>
+        {% empty %}
+            <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

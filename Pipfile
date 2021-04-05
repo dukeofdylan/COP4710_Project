@@ -5,6 +5,11 @@ name = "pypi"
 
 [packages]
 django = "*"
+pillow = "*"
+django-map-widgets = "*"
+six = "*"
+requests = "*"
+django-multiselectfield = "*"
 
 [dev-packages]
 black = "*"
