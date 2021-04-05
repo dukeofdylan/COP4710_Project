@@ -125,7 +125,7 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ("location", "rso")
+        exclude = ("location", "rso", "dtstart", "dtend", "until")
 
     def __init__(self, *args, university_id, rso_id, **kwargs):
         super().__init__(*args, **kwargs)
@@ -133,11 +133,14 @@ class CreateEventForm(forms.ModelForm):
         self.rso_id = rso_id
 
     # Am I breaking Liskov substitution principle? HELL YEAH.
-    def save(self, location, commit=True):
+    def save(self, location, dtstart, dtend, until, commit=True):
         instance = super().save(commit=False)
         instance.university_id = self.university_id
         instance.rso_id = self.rso_id
         instance.location_id = location.location_id
+        instance.dtstart = dtstart
+        instance.dtend = dtend
+        instance.until = until
         if commit:
             instance.save()
         return instance
