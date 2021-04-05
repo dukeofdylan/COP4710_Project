@@ -145,7 +145,10 @@ def create_event_view(request, university_id: int, rso_id):
     elif request.method == "POST":
         if event_form.is_valid() and location_form.is_valid():
             location = location_form.save()
-            event = event_form.save(location)
+            dtstart = request.POST["dtstart"]
+            dtend = request.POST["dtend"]
+            until = request.POST["until"]
+            event = event_form.save(location, dtstart, dtend, until)
             return redirect("event_view", university_id, rso_id, event.event_id)
         else:
             return render(request, "unievents/event_create.html", context)
