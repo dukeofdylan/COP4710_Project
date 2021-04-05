@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "accounts",
     "unievents",
     "mapwidgets",
+    "multiselectfield",
 ]
 
 MIDDLEWARE = [

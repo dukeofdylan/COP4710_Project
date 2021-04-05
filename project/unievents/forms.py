@@ -3,7 +3,7 @@ from typing import Type, cast
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from accounts.models import User
-from unievents.models import Location, RSO, University
+from unievents.models import Event, Location, RSO, University
 from django import forms
 from mapwidgets.widgets import GooglePointFieldWidget, GoogleStaticMapWidget
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -41,11 +41,6 @@ class CreateLocationForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-
-def add_location_form_decorator(cls: Type[forms.ModelForm]):
-    def save(self, commit=True):
-        pass
 
 
 class CreateUniversityForm(forms.ModelForm):
@@ -114,4 +109,35 @@ class CreateRSOForm(forms.ModelForm):
             # Very important for saving members
             self.cleaned_data["members"] |= User.objects.filter(pk=self.future_admin.id)
             self.save_m2m()
+        return instance
+
+
+class CreateEventForm(forms.ModelForm):
+    # description = models.TextField(db_column="description", blank=True, null=True)
+    phone = forms.fields.CharField(widget=forms.TextInput, label="Contact phone")
+    # dtstart = models.DateTimeField(db_column="dtstart", auto_now_add=True)
+    # dtend = models.DateTimeField(db_column="dtend", auto_now_add=True)
+    # until = models.DateTimeField(db_column="until", auto_now_add=True)
+    summary = forms.fields.CharField(widget=forms.TextInput, label="Name")
+    email = forms.fields.CharField(widget=forms.TextInput)
+    # location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=False)
+    # rso = models.ForeignKey(RSO, on_delete=models.CASCADE, blank=True, null=False)
+
+    class Meta:
+        model = Event
+        exclude = ("location", "rso")
+
+    def __init__(self, *args, university_id, rso_id, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.university_id = university_id
+        self.rso_id = rso_id
+
+    # Am I breaking Liskov substitution principle? HELL YEAH.
+    def save(self, location, commit=True):
+        instance = super().save(commit=False)
+        instance.university_id = self.university_id
+        instance.rso_id = self.rso_id
+        instance.location_id = location.location_id
+        if commit:
+            instance.save()
         return instance

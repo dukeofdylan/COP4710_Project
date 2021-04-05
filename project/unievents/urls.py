@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.urls import path
 from unievents.views import (
+    EventView,
     RSOView,
     RSOListView,
     UniversityView,
     UniversityListView,
+    create_comment_view,
+    create_event_view,
     create_rso_view,
     home_view,
     create_university_view,
@@ -31,9 +34,15 @@ urlpatterns = [
     path("university/create", create_university_view, name="universities_create"),
     path("university/list", UniversityListView.as_view(), name="universities_list"),
     path("university/<pk>/", UniversityView.as_view(), name="universities_view"),
-    path("event/<pk>/", home_view, name="events_view"),
     path("rso/<int:university_id>/create/", create_rso_view, name="rso_create"),
     path("rso/<int:university_id>/list", RSOListView.as_view(), name="rso_list"),
     path("rso/<int:university_id>/<pk>/", RSOView.as_view(), name="rso_view"),
-    path("event/<int:rso_id>/create", home_view, name="events_create"),
+    path("event/<int:university_id>/<int:rso_id>/create", create_event_view, name="event_create"),
+    path("event/<int:university_id>/<int:rso_id>/list", home_view, name="event_list"),
+    path("event/<int:university_id>/<int:rso_id>/<pk>", EventView.as_view(), name="event_view"),
+    path(
+        "event/<int:university_id>/<int:rso_id>/<int:event_id>/create_comment",
+        create_comment_view,
+        name="comment_create",
+    ),
 ]

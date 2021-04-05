@@ -13,5 +13,15 @@
             <li>No members yet.</li>
         {% endfor %}
     </ul>
-    {% comment %} <input type="button" onclick="location.href='{% url 'event_list' university.university_id rso.rso_id %}';" value="Events" /> {% endcomment %}
+    <h3> Events </h3>
+    <ul>
+        {% for event in rso.events.all %}
+            <li><a href="{% url 'event_view' university.university_id rso.rso_id event.event_id %}">{{ event.summary }}</a></li>
+        {% empty %}
+            <li>No events yet.</li>
+        {% endfor %}
+    </ul>
+    {% if is_admin %}
+        <input type="button" onclick="location.href='{% url 'event_create' university.university_id rso.rso_id %}';" value="Create event" />
+    {% endif %}
 {% endblock %}
