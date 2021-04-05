@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Universities</h1>
+{% if user.is_superadmin %}
+    <input type="button" onclick="location.href='{% url 'universities_create' %}';" value="Create University" />
+{% endif %}
+<ul>
+{% for uni in object_list %}
+    <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
+{% empty %}
+    <li>No universities found.</li>
+{% endfor %}
+</ul>
+{% endblock %}

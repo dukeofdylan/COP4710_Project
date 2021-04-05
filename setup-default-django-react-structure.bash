@@ -3,7 +3,7 @@
 echo "Please, do not run me. I am only here for projects that do not have project.json and Pipfile.lock"
 exit
 
-PROJECT_NAME=rsomaker
+PROJECT_NAME=accounts
 sudo apt update && sudo apt upgrade
 
 
@@ -11,7 +11,7 @@ sudo apt update && sudo apt upgrade
 pip3 install pipenv
 pipenv install django
 pipenv run django-admin startproject cop4710
-cd backend
+cd cop4710
 pipenv run python3 manage.py startapp $PROJECT_NAME
 pipenv run python3 manage.py migrate
 cd ..

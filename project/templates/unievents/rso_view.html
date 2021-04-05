@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{rso.name}}</h2>
+    id: {{ rso.rso_id }}</br>
+    {% comment %} student count: {{ rso.student_count }}</br> {% endcomment %}
+    description: {{ rso.description|linebreaks }}</br>
+    <h3> Members </h3>
+    <ul>
+        {% for student in rso.members.all %}
+            <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
+        {% empty %}
+            <li>No members yet.</li>
+        {% endfor %}
+    </ul>
+    <h3> Events </h3>
+    <ul>
+        {% for event in rso.events.all %}
+            <li><a href="{% url 'event_view' university.university_id rso.rso_id event.event_id %}">{{ event.summary }}</a></li>
+        {% empty %}
+            <li>No events yet.</li>
+        {% endfor %}
+    </ul>
+    {% if is_admin %}
+        <input type="button" onclick="location.href='{% url 'event_create' university.university_id rso.rso_id %}';" value="Create event" />
+    {% endif %}
+{% endblock %}
