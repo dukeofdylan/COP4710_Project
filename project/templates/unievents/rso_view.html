@@ -6,7 +6,8 @@
     {% comment %} student count: {{ rso.student_count }}</br> {% endcomment %}
     description: {{ rso.description|linebreaks }}</br>
     <h3> Members </h3>
-    <ul>
+    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul id="search__list">
         {% for student in rso.members.all %}
             <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
         {% empty %}
@@ -14,7 +15,8 @@
         {% endfor %}
     </ul>
     <h3> Events </h3>
-    <ul>
+    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul id="search__list">
         {% for event in rso.events.all %}
             <li><a href="{% url 'event_view' university.university_id rso.rso_id event.event_id %}">{{ event.summary }}</a></li>
         {% empty %}

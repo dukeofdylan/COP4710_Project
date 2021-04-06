@@ -11,6 +11,13 @@
   overflow: hidden;
 }
 
+/* List-wrap */
+.list-wrap {
+  width: 30%;
+  margin: auto;
+  overflow: hidden;
+}
+
 /* Search Lists */
 #search__bar {
   background-image: url('searchicon.png'); /* Add a search icon to input */
