@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 <div class="content-wrap">
     <h1>Registered Student Organizations</h1>
     {% if user.is_authenticated and user.university_id == university.university_id %}
@@ -9,7 +8,6 @@
         {% endif %}
     
     <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-
     <ul id="search__list">
     {% for rso in object_list %}
         <li><a href="{% url 'rso_view' university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
@@ -17,27 +15,5 @@
         <li>No organizations found.</li>
     {% endfor %}
     </ul>
-
-    <script>
-        function searchFunction() {
-        // Declare variables
-        var input, filter, ul, li, a, i, txtValue;
-        input = document.getElementById('search__bar');
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("search__list");
-        li = ul.getElementsByTagName('li');
-        
-        // Loop through all list items, and hide those who don't match the search query
-        for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
-            } else {
-            li[i].style.display = "none";
-            }
-        }
-        }
-    </script>
 </div>
 {% endblock %}
