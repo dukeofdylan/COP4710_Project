@@ -9,9 +9,9 @@ body {
     text-align: left;
 }
 
- /* Chat containers */
- .comment-container {
-    border: 2px solid #ffffff;
+/* Chat containers */
+.comment-container {
+   border: 2px solid #ffffff;
     background-color: #f1f1f1;
     border-radius: 5px;
     padding: 10px;
