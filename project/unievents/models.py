@@ -1,6 +1,5 @@
 # TODO: Add unique constraints
 from django.db import models
-from django.db.models.manager import Manager
 from accounts.models import User
 from multiselectfield import MultiSelectField
 
@@ -37,7 +36,7 @@ class University(GetFieldsMixin, models.Model):
     email_domain = models.TextField(db_column="email_domain", blank=False, null=False)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=False, null=False)
     max_avatar_size = 5 * 1024 * 1024
-    students: Manager
+    students: "models.manager.RelatedManager"
 
     class Meta:
         db_table = "university"
@@ -55,17 +54,6 @@ class RSO(GetFieldsMixin, models.Model):
         db_table = "rso"
 
 
-WEEKDAY_CHOICES = (
-    ("MO", "Monday"),
-    ("TU", "Tuesday"),
-    ("WE", "Wednesday"),
-    ("TH", "Thursday"),
-    ("FR", "Friday"),
-    ("SA", "Saturday"),
-    ("SU", "Sunday"),
-)
-
-
 class Event(GetFieldsMixin, models.Model):
     class PrivacyLevel(models.IntegerChoices):
         Public = 1
@@ -76,8 +64,18 @@ class Event(GetFieldsMixin, models.Model):
         Once = "ONCE"
         Daily = "DAILY"
         Weekly = "WEEKLY"
+        # Not implemented yet
         # Monthly = "MONTHLY"
         # Yearly = "YEARLY"
+
+    class Weekday(models.TextChoices):
+        Monday = "MO"
+        Tuesday = "TU"
+        Wednesday = "WE"
+        Thursday = "TH"
+        Friday = "FR"
+        Saturday = "SA"
+        Sunday = "SU"
 
     event_id = models.AutoField(db_column="event_id", primary_key=True)
     summary = models.TextField(db_column="summary")
@@ -106,21 +104,32 @@ class Event(GetFieldsMixin, models.Model):
         db_column="byday",
         blank=True,
         null=True,
-        choices=WEEKDAY_CHOICES,
+        choices=Weekday.choices,
         verbose_name="Repeat on",
     )
     location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=False, null=False)
     rso = models.ForeignKey(RSO, on_delete=models.CASCADE, related_name="events", blank=False, null=False)
+    tags: "models.manager.RelatedManager"
 
     class Meta:
         db_table = "event"
 
+    def formatted_tags(self):
+        return ", ".join(t.text for t in self.tags.all())
+
 
 class Comment(GetFieldsMixin, models.Model):
+    class Rating(models.IntegerChoices):
+        Excellent = 5
+        Very_Good = 4
+        Average = 3
+        Poor = 2
+        Terrible = 1
+
     comment_id = models.AutoField(db_column="comment_id", primary_key=True)
     postdate = models.DateTimeField(db_column="postdate", auto_now_add=True, blank=False, null=False)
     text = models.TextField(db_column="text", blank=False, null=False)
-    rating = models.IntegerField(db_column="rating", blank=False, null=False)
+    rating = models.IntegerField(db_column="rating", blank=False, null=False, choices=Rating.choices)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
 
@@ -130,8 +139,8 @@ class Comment(GetFieldsMixin, models.Model):
 
 class Event_tag(GetFieldsMixin, models.Model):
     event_tag_id = models.AutoField(db_column="event_tag_id", primary_key=True)
-    event_tag_name = models.TextField(db_column="event_tag_name", blank=False, null=False)
-    event = models.ManyToManyField(Event, related_name="tags", blank=False, null=False)
+    text = models.TextField(db_column="text", blank=False, null=False)
+    events = models.ManyToManyField(Event, related_name="tags", blank=False)
 
     class Meta:
         db_table = "event_tag"

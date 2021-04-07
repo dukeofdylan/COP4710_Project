@@ -5,27 +5,49 @@
 <form method="post" action="{% url 'event_create' university.university_id rso.rso_id %}">
     {% csrf_token %}
     {{ location_form.as_p }}
-    {{ event_form.as_p }}
+    {{ event_form.summary.errors }}
+    <p>{{ event_form.summary.label_tag }} {{ event_form.summary }}</p>
+    {{ event_form.privacy_level.errors }}
+    <p>{{ event_form.privacy_level.label_tag }} {{ event_form.privacy_level }}</p>
+    {{ event_form.description.errors }}
+    <p>{{ event_form.description.label_tag }} {{ event_form.description }}</p>
+    {{ event_form.phone.errors }}
+    <p>{{ event_form.phone.label_tag }} {{ event_form.phone }}</p>
+    {{ event_form.email.errors }}
+    <p>{{ event_form.email.label_tag }} {{ event_form.email }}</p>
+    {{ event_form.tags.errors }}
+    <p>{{ event_form.tags.label_tag }} {{ event_form.tags }}</p>
+    {% comment %} HERE'S HOW YOU ITERATE OVER TAGS {% endcomment %}
+    <div hidden>
+        {% for tag in possible_tags %}
+            <p>{{tag.text}}</p>
+        {% endfor %}
+    </div>
+    {{ event_form.dtstart.errors }}
+    <p>{{ event_form.dtstart.label_tag }} {{ event_form.dtstart }}</p>
+    {{ event_form.dtend.errors }}
+    <p>{{ event_form.dtend.label_tag }} {{ event_form.dtend }}</p>
+    {{ event_form.freq.errors }}
+    <p>{{ event_form.freq.label_tag }} {{ event_form.freq }}</p>
+    <div class="rrule-inputs">
+        {{ event_form.non_field_errors }}
+        {{ event_form.until.errors }}
+        <p>{{ event_form.until.label_tag }} {{ event_form.until }}</p>
+        {{ event_form.byday.errors }}
+        <p>{{ event_form.byday.label_tag }} {{ event_form.byday }}</p>
+    </div>
     <input type="submit" value="Create Event" />
 </form>
 <script>
-function showRRULEInput() {
-    jQuery('.until-input').parent().show()
-    jQuery('.byday-input').show()
-}
-function hideRRULEInput() {
-    jQuery('.until-input').parent().hide()
-    jQuery('.byday-input').hide()
-}
-function onRRULETypeChoiceChange() {
-    if (jQuery('.rrule-type-choice-input').val() == "WEEKLY")
-            showRRULEInput()
-        else
-            hideRRULEInput()
-}
-jQuery(document).ready(function () {
-    onRRULETypeChoiceChange()
-    jQuery('.rrule-type-choice-input').change(onRRULETypeChoiceChange)
-});
+    function onRRULETypeChoiceChange() {
+        if (jQuery('.rrule-type-choice-input').val() == "WEEKLY")
+                jQuery('.rrule-inputs').show()
+            else
+                jQuery('.rrule-inputs').hide()
+    }
+    jQuery(document).ready(function () {
+        onRRULETypeChoiceChange()
+        jQuery('.rrule-type-choice-input').change(onRRULETypeChoiceChange)
+    });
 </script>
 {% endblock %}
