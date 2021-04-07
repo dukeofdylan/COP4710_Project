@@ -8,13 +8,17 @@
     description: {{ university.description|linebreaks }}</br>
     Location: </br> <img src="{{ university.location.image.url }}" alt="Location has not loaded"/></br> 
     Avatar: </br><img style="width:100%;max-width:200px;" src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/>
-    <h3> Students registered at {{ university.name }} </h3>
-    <ul>
-        {% for student in university.students.all %}
-            <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
-        {% empty %}
-            <li>No students registered yet.</li>
-        {% endfor %}
-    </ul>
+    
+    <div class="content-wrap">
+        <h3> Students registered at {{ university.name }} </h3>
+        <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+        <ul id="search__list">
+            {% for student in university.students.all %}
+                <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
+            {% empty %}
+                <li>No students registered yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
     <input type="button" onclick="location.href='{% url 'rso_list' university.university_id %}';" value="Registered Student Organizations" />
 {% endblock %}
