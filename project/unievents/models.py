@@ -117,10 +117,17 @@ class Event(GetFieldsMixin, models.Model):
 
 
 class Comment(GetFieldsMixin, models.Model):
+    class Rating(models.IntegerChoices):
+        Excellent = 5
+        Very_Good = 4
+        Average = 3
+        Poor = 2
+        Terrible = 1
+
     comment_id = models.AutoField(db_column="comment_id", primary_key=True)
     postdate = models.DateTimeField(db_column="postdate", auto_now_add=True, blank=False, null=False)
     text = models.TextField(db_column="text", blank=False, null=False)
-    rating = models.IntegerField(db_column="rating", blank=False, null=False)
+    rating = models.IntegerField(db_column="rating", blank=False, null=False, choices=Rating.choices)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
 
