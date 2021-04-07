@@ -17,3 +17,6 @@ function searchFunction() {
       }
   }
 }
+jQuery(function ($) {
+    $(".date-input").datepicker();
+});

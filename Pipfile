@@ -10,6 +10,7 @@ django-map-widgets = "*"
 six = "*"
 requests = "*"
 django-multiselectfield = "*"
+django-stubs = "*"
 
 [dev-packages]
 black = "*"

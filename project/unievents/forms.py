@@ -3,13 +3,23 @@ from typing import Type, cast
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from accounts.models import User
+from accounts.forms import CaseInsensitiveEmail
 from unievents.models import Event, Location, RSO, University
 from django import forms
+from multiselectfield import MultiSelectFormField
 from mapwidgets.widgets import GooglePointFieldWidget, GoogleStaticMapWidget
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.point import Point
+import datetime
 
 from unievents.util import download
 from cop4710.settings import MEDIA_ROOT
+
+
+DATE_INPUT_ARGS = {"class": "date-input"}
+UNTIL_INPUT_ARGS = {"class": "date-input until-input"}
+BYDAY_INPUT_ARGS = {"class": "byday-input"}
+RRULE_TYPE_CHOICE_INPUT_ATTRS = {"class": "rrule-type-choice-input"}
 
 
 class DynamicForm(forms.Form):
@@ -46,6 +56,7 @@ class CreateLocationForm(forms.ModelForm):
 class CreateUniversityForm(forms.ModelForm):
     name = forms.fields.CharField(widget=forms.TextInput)
     description = forms.fields.CharField(widget=forms.Textarea)
+    # FIXME: Make me case insensitive
     email_domain = forms.fields.CharField(widget=forms.TextInput)
     avatar_image = forms.fields.ImageField(max_length=10000, allow_empty_file=False)
 
@@ -113,34 +124,49 @@ class CreateRSOForm(forms.ModelForm):
 
 
 class CreateEventForm(forms.ModelForm):
-    # description = models.TextField(db_column="description", blank=True, null=True)
     phone = forms.fields.CharField(widget=forms.TextInput, label="Contact phone")
-    # dtstart = models.DateTimeField(db_column="dtstart", auto_now_add=True)
-    # dtend = models.DateTimeField(db_column="dtend", auto_now_add=True)
-    # until = models.DateTimeField(db_column="until", auto_now_add=True)
+    dtstart = forms.fields.SplitDateTimeField(
+        widget=forms.SplitDateTimeWidget(time_format="%H:%M", date_attrs=DATE_INPUT_ARGS),
+        initial=datetime.datetime.now,
+        label="From",
+    )
+    dtend = forms.fields.SplitDateTimeField(
+        widget=forms.SplitDateTimeWidget(time_format="%H:%M", date_attrs=DATE_INPUT_ARGS),
+        initial=lambda: datetime.datetime.now() + datetime.timedelta(hours=1),
+        label="To",
+    )
+    until = forms.DateField(
+        label="Last occurrence",
+        widget=forms.DateInput(attrs=UNTIL_INPUT_ARGS),
+        required=False,
+    )
     summary = forms.fields.CharField(widget=forms.TextInput, label="Name")
     email = forms.fields.CharField(widget=forms.TextInput)
-    # location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=False)
-    # rso = models.ForeignKey(RSO, on_delete=models.CASCADE, blank=True, null=False)
+    # freq = forms.ChoiceField(
+    #     choices=Event.Frequency.choices,
+    #     widget=forms.widgets.ChoiceWidget(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS, choices=Event.Frequency.choices),
+    # )
 
     class Meta:
         model = Event
-        exclude = ("location", "rso", "dtstart", "dtend", "until")
+        exclude = ("location", "rso")
+        widgets = {
+            "freq": forms.widgets.Select(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS),
+            "byday": forms.CheckboxSelectMultiple(attrs=BYDAY_INPUT_ARGS),
+        }
 
     def __init__(self, *args, university_id, rso_id, **kwargs):
         super().__init__(*args, **kwargs)
         self.university_id = university_id
         self.rso_id = rso_id
+        self.fields["dtstart"].fields
 
     # Am I breaking Liskov substitution principle? HELL YEAH.
-    def save(self, location, dtstart, dtend, until, commit=True):
+    def save(self, location, commit=True):
         instance = super().save(commit=False)
         instance.university_id = self.university_id
         instance.rso_id = self.rso_id
         instance.location_id = location.location_id
-        instance.dtstart = dtstart
-        instance.dtend = dtend
-        instance.until = until
         if commit:
             instance.save()
         return instance

@@ -14,9 +14,9 @@ class GetFieldsMixin:
 
 class Location(GetFieldsMixin, models.Model):
     location_id = models.AutoField(db_column="location_id", primary_key=True)
-    longitude = models.FloatField(db_column="longitude", blank=True, null=False)
-    latitude = models.FloatField(db_column="latitude", blank=True, null=False)
-    image = models.ImageField(db_column="image", blank=True, null=False)
+    longitude = models.FloatField(db_column="longitude", blank=False, null=False)
+    latitude = models.FloatField(db_column="latitude", blank=False, null=False)
+    image = models.ImageField(db_column="image", blank=False, null=False)
 
     class Meta:
         db_table = "location"
@@ -30,12 +30,12 @@ def uni_image_upload_to(instance, filename):
 class University(GetFieldsMixin, models.Model):
     university_id = models.AutoField(db_column="university_id", primary_key=True)
     # TODO: make it a view or make a trigger for it
-    student_count = models.IntegerField(db_column="student_count", default=0)
-    name = models.TextField(db_column="name", blank=True)
-    description = models.TextField(db_column="description", blank=True, null=True)
-    avatar_image = models.ImageField(db_column="avatar_image", blank=True, null=False, upload_to=uni_image_upload_to)
-    email_domain = models.TextField(db_column="email_domain")
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=False)
+    student_count = models.IntegerField(db_column="student_count", blank=True, null=False)
+    name = models.TextField(db_column="name", blank=False, null=False)
+    description = models.TextField(db_column="description", blank=True, null=False, default="")
+    avatar_image = models.ImageField(db_column="avatar_image", blank=False, null=False, upload_to=uni_image_upload_to)
+    email_domain = models.TextField(db_column="email_domain", blank=False, null=False)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=False, null=False)
     max_avatar_size = 5 * 1024 * 1024
     students: Manager
 
@@ -45,10 +45,10 @@ class University(GetFieldsMixin, models.Model):
 
 class RSO(GetFieldsMixin, models.Model):
     rso_id = models.AutoField(db_column="rso_id", primary_key=True)
-    name = models.TextField(db_column="name")
-    description = models.TextField(db_column="description", null=False, default="")
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin_at")
-    university = models.ForeignKey(University, on_delete=models.CASCADE, null=False, related_name="rsos")
+    name = models.TextField(db_column="name", blank=False, null=False)
+    description = models.TextField(db_column="description", blank=True, null=False, default="")
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False, related_name="admin_at")
+    university = models.ForeignKey(University, on_delete=models.CASCADE, blank=False, null=False, related_name="rsos")
     members = models.ManyToManyField(User, related_name="rso_memberships")
 
     class Meta:
@@ -73,24 +73,44 @@ class Event(GetFieldsMixin, models.Model):
         RSO_Private = 3
 
     class Frequency(models.TextChoices):
+        Once = "ONCE"
         Daily = "DAILY"
         Weekly = "WEEKLY"
-        Monthly = "MONTHLY"
-        Yearly = "YEARLY"
+        # Monthly = "MONTHLY"
+        # Yearly = "YEARLY"
 
     event_id = models.AutoField(db_column="event_id", primary_key=True)
     summary = models.TextField(db_column="summary")
-    privacy_level = models.IntegerField(db_column="privacy_level", null=False, blank=True, choices=PrivacyLevel.choices)
-    description = models.TextField(db_column="description", blank=True, null=True)
-    phone = models.TextField(db_column="phone", blank=True, null=True)
-    email = models.TextField(db_column="email", blank=True, null=True)
-    dtstart = models.DateTimeField(db_column="dtstart", blank=True)
+    privacy_level = models.IntegerField(
+        db_column="privacy_level",
+        null=False,
+        blank=False,
+        choices=PrivacyLevel.choices,
+        default=PrivacyLevel.Public,
+    )
+    description = models.TextField(db_column="description", blank=True, null=False, default="")
+    phone = models.TextField(db_column="phone", blank=False, null=False)
+    email = models.TextField(db_column="email", blank=False, null=False)
+    dtstart = models.DateTimeField(db_column="dtstart", blank=False, null=False)
     dtend = models.DateTimeField(db_column="dtend", blank=True)
-    until = models.DateTimeField(db_column="until", null=True)
-    freq = models.TextField(db_column="freq", null=True, choices=Frequency.choices, verbose_name="frequency")
-    byday = MultiSelectField(db_column="byday", null=True, choices=WEEKDAY_CHOICES)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=False)
-    rso = models.ForeignKey(RSO, on_delete=models.CASCADE, related_name="events", blank=True, null=False)
+    freq = models.TextField(
+        db_column="freq",
+        null=False,
+        blank=True,
+        choices=Frequency.choices,
+        default=Frequency.Once,
+        verbose_name="frequency",
+    )
+    until = models.DateField(db_column="until", blank=True, null=True)
+    byday = MultiSelectField(
+        db_column="byday",
+        blank=True,
+        null=True,
+        choices=WEEKDAY_CHOICES,
+        verbose_name="Repeat on",
+    )
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=False, null=False)
+    rso = models.ForeignKey(RSO, on_delete=models.CASCADE, related_name="events", blank=False, null=False)
 
     class Meta:
         db_table = "event"
@@ -98,11 +118,11 @@ class Event(GetFieldsMixin, models.Model):
 
 class Comment(GetFieldsMixin, models.Model):
     comment_id = models.AutoField(db_column="comment_id", primary_key=True)
-    postdate = models.DateTimeField(db_column="postdate", auto_now_add=True)
-    text = models.TextField(db_column="text", blank=True)
-    rating = models.IntegerField(db_column="rating", blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="comments")
+    postdate = models.DateTimeField(db_column="postdate", auto_now_add=True, blank=False, null=False)
+    text = models.TextField(db_column="text", blank=False, null=False)
+    rating = models.IntegerField(db_column="rating", blank=False, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="comments", blank=False, null=False)
 
     class Meta:
         db_table = "comment"
@@ -110,8 +130,8 @@ class Comment(GetFieldsMixin, models.Model):
 
 class Event_tag(GetFieldsMixin, models.Model):
     event_tag_id = models.AutoField(db_column="event_tag_id", primary_key=True)
-    event_tag_name = models.TextField(db_column="event_tag_name")
-    event = models.ManyToManyField(Event, related_name="tags")
+    event_tag_name = models.TextField(db_column="event_tag_name", blank=False, null=False)
+    event = models.ManyToManyField(Event, related_name="tags", blank=False, null=False)
 
     class Meta:
         db_table = "event_tag"

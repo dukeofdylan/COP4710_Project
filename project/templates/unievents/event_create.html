@@ -6,10 +6,26 @@
     {% csrf_token %}
     {{ location_form.as_p }}
     {{ event_form.as_p }}
-    <p><label for="id_dtstart">Dtstart:</label> <input type="text" name="dtstart" id="id_dtstart"></p>
-    <p><label for="id_dtend">Dtend:</label> <input type="text" name="dtend" id="id_dtend"></p>
-    <p><label for="id_until">Until:</label> <input type="text" name="until" required id="id_until"></p>
     <input type="submit" value="Create Event" />
 </form>
-
+<script>
+function showRRULEInput() {
+    jQuery('.until-input').parent().show()
+    jQuery('.byday-input').show()
+}
+function hideRRULEInput() {
+    jQuery('.until-input').parent().hide()
+    jQuery('.byday-input').hide()
+}
+function onRRULETypeChoiceChange() {
+    if (jQuery('.rrule-type-choice-input').val() == "WEEKLY")
+            showRRULEInput()
+        else
+            hideRRULEInput()
+}
+jQuery(document).ready(function () {
+    onRRULETypeChoiceChange()
+    jQuery('.rrule-type-choice-input').change(onRRULETypeChoiceChange)
+});
+</script>
 {% endblock %}
