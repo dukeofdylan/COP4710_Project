@@ -29,7 +29,7 @@
         <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
         <ul id="search__list">
         {% for rso in university.rsos.all %}
-            <li><a href="{% url 'rso_view' university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+            <li><a href="{% url 'rso_view' rso.rso_id %}">{{ rso.name }}</a></li>
         {% empty %}
             <li>No organizations registered yet.</li>
         {% endfor %}

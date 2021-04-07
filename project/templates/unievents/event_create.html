@@ -2,7 +2,7 @@
 
 {% block content %}
 {{ location_form.media }}
-<form method="post" action="{% url 'event_create' university.university_id rso.rso_id %}">
+<form method="post" action="{% url 'event_create' rso.rso_id %}">
     {% csrf_token %}
     {{ location_form.as_p }}
     {{ event_form.summary.errors }}
