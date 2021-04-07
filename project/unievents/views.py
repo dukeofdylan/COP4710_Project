@@ -155,5 +155,5 @@ class EventView(LoginRequiredMixin, DetailView):
 def create_comment_view(request, university_id, rso_id, event_id):
     if request.method != "POST":
         return HttpResponseNotAllowed("Only POST requests are allowed on this url.")
-    Comment(event_id=event_id, user_id=request.user.id, text=request.POST["text"], rating=5).save()
+    Comment(event_id=event_id, user_id=request.user.id, text=request.POST["text"], rating=request.POST["rating"]).save()
     return redirect("event_view", university_id, rso_id, event_id)
