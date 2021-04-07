@@ -12,7 +12,7 @@
     {% endif %}
     <ul>
     {% for rso in user.admin_at.all %}
-        <li><a href="{% url 'rso_view' rso.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+        <li><a href="{% url 'rso_view' rso.rso_id %}">{{ rso.name }}</a></li>
     {% endfor %}
     </ul>
 {% endblock %}
