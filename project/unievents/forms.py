@@ -6,7 +6,6 @@ from accounts.models import User
 from accounts.forms import CaseInsensitiveEmail
 from unievents.models import Event, Location, RSO, University
 from django import forms
-from multiselectfield import MultiSelectFormField
 from mapwidgets.widgets import GooglePointFieldWidget, GoogleStaticMapWidget
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.point import Point
@@ -17,8 +16,6 @@ from cop4710.settings import MEDIA_ROOT
 
 
 DATE_INPUT_ARGS = {"class": "date-input"}
-UNTIL_INPUT_ARGS = {"class": "date-input until-input"}
-BYDAY_INPUT_ARGS = {"class": "byday-input"}
 RRULE_TYPE_CHOICE_INPUT_ATTRS = {"class": "rrule-type-choice-input"}
 
 
@@ -28,6 +25,11 @@ class DynamicForm(forms.Form):
 
         for key, value in extra.items():
             self.fields[key] = value
+
+
+class CaseInsensitiveCharField(forms.CharField):
+    def clean(self, value):
+        return super().clean(value.lower())
 
 
 class CreateLocationForm(forms.ModelForm):
@@ -57,7 +59,7 @@ class CreateUniversityForm(forms.ModelForm):
     name = forms.fields.CharField(widget=forms.TextInput)
     description = forms.fields.CharField(widget=forms.Textarea)
     # FIXME: Make me case insensitive
-    email_domain = forms.fields.CharField(widget=forms.TextInput)
+    email_domain = CaseInsensitiveCharField(widget=forms.TextInput)
     avatar_image = forms.fields.ImageField(max_length=10000, allow_empty_file=False)
 
     class Meta:
@@ -137,29 +139,28 @@ class CreateEventForm(forms.ModelForm):
     )
     until = forms.DateField(
         label="Last occurrence",
-        widget=forms.DateInput(attrs=UNTIL_INPUT_ARGS),
+        widget=forms.DateInput(attrs=DATE_INPUT_ARGS),
         required=False,
     )
     summary = forms.fields.CharField(widget=forms.TextInput, label="Name")
-    email = forms.fields.CharField(widget=forms.TextInput)
-    # freq = forms.ChoiceField(
-    #     choices=Event.Frequency.choices,
-    #     widget=forms.widgets.ChoiceWidget(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS, choices=Event.Frequency.choices),
-    # )
+    email = CaseInsensitiveEmail(widget=forms.TextInput, label="Contact email")
 
     class Meta:
         model = Event
         exclude = ("location", "rso")
-        widgets = {
-            "freq": forms.widgets.Select(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS),
-            "byday": forms.CheckboxSelectMultiple(attrs=BYDAY_INPUT_ARGS),
-        }
+        widgets = {"freq": forms.widgets.Select(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS)}
 
     def __init__(self, *args, university_id, rso_id, **kwargs):
         super().__init__(*args, **kwargs)
         self.university_id = university_id
         self.rso_id = rso_id
         self.fields["dtstart"].fields
+
+    def clean(self):
+        if self.cleaned_data["freq"] == "WEEKLY":
+            if not (self.cleaned_data["until"] and self.cleaned_data["byday"]):
+                raise forms.ValidationError('"Last occurrence" and "Repeat on" must be speficied for weekly events.')
+        return self.cleaned_data
 
     # Am I breaking Liskov substitution principle? HELL YEAH.
     def save(self, location, commit=True):
