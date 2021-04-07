@@ -15,6 +15,14 @@
     <p>{{ event_form.phone.label_tag }} {{ event_form.phone }}</p>
     {{ event_form.email.errors }}
     <p>{{ event_form.email.label_tag }} {{ event_form.email }}</p>
+    {{ event_form.tags.errors }}
+    <p>{{ event_form.tags.label_tag }} {{ event_form.tags }}</p>
+    {% comment %} HERE'S HOW YOU ITERATE OVER TAGS {% endcomment %}
+    <div hidden>
+        {% for tag in possible_tags %}
+            <p>{{tag.text}}</p>
+        {% endfor %}
+    </div>
     {{ event_form.dtstart.errors }}
     <p>{{ event_form.dtstart.label_tag }} {{ event_form.dtstart }}</p>
     {{ event_form.dtend.errors }}

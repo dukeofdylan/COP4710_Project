@@ -7,6 +7,7 @@
     <p>Description: {{ event.description|linebreaks }}</p>
     <p>Contact Phone: {{ event.phone }}</p>
     <p>Contact Email: {{ event.email }}</p>
+    <p>Tags: {{ event.formatted_tags }} </p>
     <p>Location: </br> <img src="{{ event.location.image.url }}" alt="Location has not loaded"/></p>
     <p>Start time: {{event.dtstart.isoformat}}</p>
     <p>End time: {{ event.dtend.isoformat }}</p>
