@@ -3,8 +3,8 @@
 {% block content %}
 <div class="content-wrap">
     <h1>Registered Student Organizations</h1>
-    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul id="search__list">
+    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul class="search__list">
     {% for rso in object_list %}
         <li><a href="{% url 'rso_view' rso.university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
     {% empty %}
