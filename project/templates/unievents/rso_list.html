@@ -3,10 +3,6 @@
 {% block content %}
 <div class="content-wrap">
     <h1>Registered Student Organizations</h1>
-    {% if user.is_authenticated and user.university_id == university.university_id %}
-            </br><input type="button" onclick="location.href='{% url 'rso_create' university.university_id %}';" value="Create RSO" />
-        {% endif %}
-    
     <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
     <ul id="search__list">
     {% for rso in object_list %}
