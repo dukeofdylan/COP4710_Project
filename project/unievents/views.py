@@ -11,7 +11,7 @@ from accounts.models import User
 from unievents.forms import CreateEventForm, CreateLocationForm, CreateRSOForm, CreateUniversityForm
 from django.core.exceptions import PermissionDenied
 
-from unievents.models import Comment, Event, RSO, University
+from unievents.models import Comment, Event, Event_tag, RSO, University
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -154,10 +154,9 @@ def leave_rso_view(request, university_id, rso_id):
     user: User = request.user
     if user.is_admin(rso_id):
         raise PermissionError("Admin of an RSO cannot leave it.")
-    query = user.rso_memberships.filter(pk=rso_id)
-    if not query:
+    rso = user.rso_memberships.filter(pk=rso_id).first()
+    if rso is None:
         raise PermissionError("Only RSO members can leave it, duh.")
-    rso = query[0]
     user.rso_memberships.remove(rso)
     return redirect("rso_view", university_id, rso_id)
 
@@ -172,6 +171,7 @@ def create_event_view(request, university_id: int, rso_id):
         "is_admin": request.user.is_admin(rso_id),
         "rso": RSO.objects.get(pk=rso_id),
         "university": University.objects.get(pk=university_id),
+        "possible_tags": Event_tag.objects.all(),
     }
     if request.method == "GET":
         return render(request, "unievents/event_create.html", context)

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from accounts.models import User
 from accounts.forms import CaseInsensitiveEmail
-from unievents.models import Event, Location, RSO, University
+from unievents.models import Event, Event_tag, Location, RSO, University
 from django import forms
 from mapwidgets.widgets import GooglePointFieldWidget, GoogleStaticMapWidget
 from django.contrib.gis.geos.geometry import GEOSGeometry
@@ -125,6 +125,12 @@ class CreateRSOForm(forms.ModelForm):
         return instance
 
 
+class TagFormField(forms.CharField):
+    def clean(self, value):
+        value = super().clean(value)
+        return [t.lower().strip() for t in value.split(",") if t.strip()]
+
+
 class CreateEventForm(forms.ModelForm):
     phone = forms.fields.CharField(widget=forms.TextInput, label="Contact phone")
     dtstart = forms.fields.SplitDateTimeField(
@@ -144,6 +150,7 @@ class CreateEventForm(forms.ModelForm):
     )
     summary = forms.fields.CharField(widget=forms.TextInput, label="Name")
     email = CaseInsensitiveEmail(widget=forms.TextInput, label="Contact email")
+    tags = TagFormField(required=False)
 
     class Meta:
         model = Event
@@ -165,9 +172,13 @@ class CreateEventForm(forms.ModelForm):
     # Am I breaking Liskov substitution principle? HELL YEAH.
     def save(self, location, commit=True):
         instance = super().save(commit=False)
+
         instance.university_id = self.university_id
         instance.rso_id = self.rso_id
         instance.location_id = location.location_id
         if commit:
             instance.save()
+            for t in self.cleaned_data["tags"]:
+                tag = Event_tag.objects.filter(text=t).first() or Event_tag.objects.create(text=t)
+                tag.events.add(instance)
         return instance
