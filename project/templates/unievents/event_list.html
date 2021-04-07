@@ -2,13 +2,14 @@
 
 {% block content %}
 <div class="content-wrap">
-    <h1>Registered Student Organizations</h1>
+    <h1>Events</h1>
+
     <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
     <ul id="search__list">
-    {% for rso in object_list %}
-        <li><a href="{% url 'rso_view' rso.university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+    {% for event in filtered_events %}
+        <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
     {% empty %}
-        <li>No organizations found.</li>
+        <li>No events found.</li>
     {% endfor %}
     </ul>
 </div>
