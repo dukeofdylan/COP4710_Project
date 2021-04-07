@@ -4,9 +4,8 @@ from django.db.models.base import ModelBase
 from django.http.response import HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.http import HttpRequest
-from django.views.generic.base import ContextMixin, View
-from django.views.generic.detail import DetailView, SingleObjectMixin
-from django.views.generic.list import ListView, MultipleObjectMixin
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from accounts.views import login_required, super_admin_required
 from unievents.forms import CreateEventForm, CreateLocationForm, CreateRSOForm, CreateUniversityForm
 from django.core.exceptions import PermissionDenied
@@ -86,13 +85,6 @@ def add_to_context_decorator(**models: Type[models.Model]):
     return arghandler
 
 
-# class UniversityInContextMixin:
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)  # type: ignore
-#         context["university"] = University.objects.get(pk=self.kwargs.pop("university_id"))  # type: ignore
-#         return context
-
-
 @add_to_context_decorator(university_id=University)
 class RSOView(LoginRequiredMixin, DetailView):
     template_name = "unievents/rso_view.html"
@@ -100,7 +92,8 @@ class RSOView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
-        ctx["is_admin"] = self.request.user.is_admin(ctx["rso"].rso_id)
+        # There is a liskov problem here...
+        ctx["is_admin"] = self.request.user.is_admin(ctx["rso"].rso_id)  # type: ignore
         print(ctx["is_admin"])
         return ctx
 
@@ -145,10 +138,7 @@ def create_event_view(request, university_id: int, rso_id):
     elif request.method == "POST":
         if event_form.is_valid() and location_form.is_valid():
             location = location_form.save()
-            dtstart = request.POST["dtstart"]
-            dtend = request.POST["dtend"]
-            until = request.POST["until"]
-            event = event_form.save(location, dtstart, dtend, until)
+            event = event_form.save(location)
             return redirect("event_view", university_id, rso_id, event.event_id)
         else:
             return render(request, "unievents/event_create.html", context)
