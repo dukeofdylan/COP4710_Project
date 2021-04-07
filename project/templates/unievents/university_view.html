@@ -10,7 +10,7 @@
     Avatar: </br><img style="width:100%;max-width:200px;" src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/>
     
     <div class="content-wrap">
-        <h3> Students registered at {{ university.name }} </h3>
+        <h3> Students </h3>
         <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
         <ul id="search__list">
             {% for student in university.students.all %}
@@ -20,5 +20,19 @@
             {% endfor %}
         </ul>
     </div>
-    <input type="button" onclick="location.href='{% url 'rso_list' university.university_id %}';" value="Registered Student Organizations" />
+    <div class="content-wrap">
+        <h3>Registered Student Organizations</h1>
+        {% if user.is_authenticated and user.university_id == university.university_id %}
+                </br><input type="button" onclick="location.href='{% url 'rso_create' university.university_id %}';" value="Create RSO" />
+            {% endif %}
+        
+        <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+        <ul id="search__list">
+        {% for rso in university.rsos.all %}
+            <li><a href="{% url 'rso_view' university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+        {% empty %}
+            <li>No organizations registered yet.</li>
+        {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

@@ -25,6 +25,8 @@ from unievents.views import (
     create_rso_view,
     home_view,
     create_university_view,
+    join_rso_view,
+    leave_rso_view,
 )
 from django.views.generic import RedirectView
 
@@ -37,6 +39,8 @@ urlpatterns = [
     path("rso/<int:university_id>/create/", create_rso_view, name="rso_create"),
     path("rso/<int:university_id>/list", RSOListView.as_view(), name="rso_list"),
     path("rso/<int:university_id>/<pk>/", RSOView.as_view(), name="rso_view"),
+    path("rso/<int:university_id>/<int:rso_id>/join", join_rso_view, name="rso_join"),
+    path("rso/<int:university_id>/<int:rso_id>/leave", leave_rso_view, name="rso_leave"),
     path("event/<int:university_id>/<int:rso_id>/create", create_event_view, name="event_create"),
     path("event/<int:university_id>/<int:rso_id>/list", home_view, name="event_list"),
     path("event/<int:university_id>/<int:rso_id>/<pk>", EventView.as_view(), name="event_view"),

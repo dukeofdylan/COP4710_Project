@@ -14,6 +14,17 @@
             <li>No members yet.</li>
         {% endfor %}
     </ul>
+    {% if user_can_join %}
+        <form method="post" action="{% url 'rso_join' rso.university_id rso.rso_id %}">
+            {% csrf_token %}
+            <input type="submit" value="Join RSO" />
+        </form>
+    {% elif user_is_already_member %}
+        <form method="post" action="{% url 'rso_leave' rso.university_id rso.rso_id %}">
+            {% csrf_token %}
+            <input type="submit" value="Leave RSO" />
+        </form>
+    {% endif %}
     <h3> Events </h3>
     <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
     <ul id="search__list">

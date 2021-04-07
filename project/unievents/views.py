@@ -1,4 +1,4 @@
-from typing import Any, Dict, Type, Union
+from typing import Any, Dict, Type, Union, cast
 from django.db import models
 from django.db.models.base import ModelBase
 from django.http.response import HttpResponseNotAllowed
@@ -7,6 +7,7 @@ from django.http import HttpRequest
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from accounts.views import login_required, super_admin_required
+from accounts.models import User
 from unievents.forms import CreateEventForm, CreateLocationForm, CreateRSOForm, CreateUniversityForm
 from django.core.exceptions import PermissionDenied
 
@@ -18,7 +19,7 @@ def being_a_student_required(func):
     @login_required()
     def inner(request, university_id: int, *args, **kwargs):
         if request.user.university_id != university_id:
-            return redirect("home")
+            raise PermissionError("Being a student at the university is required to view this page.")
         return func(request, university_id, *args, **kwargs)
 
     return inner
@@ -30,6 +31,15 @@ def being_an_admin_required(func):
         if not request.user.is_admin(rso_id):
             raise PermissionDenied("Admin privileges required to view this page.")
         return func(request, university_id, rso_id, *args, **kwargs)
+
+    return inner
+
+
+def post_requests_only(func):
+    def inner(request, *args, **kwargs):
+        if request.method != "POST":
+            return HttpResponseNotAllowed("Only POST requests are allowed on this url.")
+        return func(request, *args, **kwargs)
 
     return inner
 
@@ -93,8 +103,12 @@ class RSOView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
         # There is a liskov problem here...
-        ctx["is_admin"] = self.request.user.is_admin(ctx["rso"].rso_id)  # type: ignore
-        print(ctx["is_admin"])
+        user: User = cast(User, self.request.user)
+        rso: RSO = ctx["rso"]
+        ctx["is_admin"] = user.is_admin(rso.rso_id)
+        user_is_already_member = bool(user.rso_memberships.filter(pk=rso.rso_id))
+        ctx["user_is_already_member"] = user_is_already_member
+        ctx["user_can_join"] = user.university == rso.university and not user_is_already_member
         return ctx
 
 
@@ -120,6 +134,32 @@ def create_rso_view(request, university_id: int):
             return render(request, "unievents/rso_create.html", context)
     else:
         return render(request, "unievents/rso_create.html", context)
+
+
+@post_requests_only
+@being_a_student_required
+def join_rso_view(request, university_id, rso_id):
+    user: User = request.user
+    query = user.rso_memberships.filter(pk=rso_id)
+    if query:
+        raise PermissionError("RSO members cannot join again, duh.")
+    rso = RSO.objects.get(pk=rso_id)
+    rso.members.add(user)
+    return redirect("rso_view", university_id, rso_id)
+
+
+@post_requests_only
+@being_a_student_required
+def leave_rso_view(request, university_id, rso_id):
+    user: User = request.user
+    if user.is_admin(rso_id):
+        raise PermissionError("Admin of an RSO cannot leave it.")
+    query = user.rso_memberships.filter(pk=rso_id)
+    if not query:
+        raise PermissionError("Only RSO members can leave it, duh.")
+    rso = query[0]
+    user.rso_memberships.remove(rso)
+    return redirect("rso_view", university_id, rso_id)
 
 
 @being_an_admin_required
@@ -152,8 +192,7 @@ class EventView(LoginRequiredMixin, DetailView):
     model = Event
 
 
+@post_requests_only
 def create_comment_view(request, university_id, rso_id, event_id):
-    if request.method != "POST":
-        return HttpResponseNotAllowed("Only POST requests are allowed on this url.")
     Comment(event_id=event_id, user_id=request.user.id, text=request.POST["text"], rating=request.POST["rating"]).save()
     return redirect("event_view", university_id, rso_id, event_id)
