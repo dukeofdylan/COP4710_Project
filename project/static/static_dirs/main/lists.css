@@ -3,19 +3,53 @@
   box-sizing: border-box;
 }
 
+/* Remove default list styling */
+ul, li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 /* Content wrap */
 .content-wrap {
   /* Responsive content */
-  width: 85%;
-  margin: auto;
+  width: 100%;
+  margin: 0 auto;
   overflow: hidden;
 }
 
 /* List-wrap */
 .list-wrap {
   width: 30%;
-  margin: auto;
+  margin: 0 auto;
   overflow: hidden;
+}
+
+/* Grid layout 
+==============================================================================*/
+#grid-container {
+  display: grid;
+  margin: 0 auto;
+  width: 80%; /* Responsive width */
+  grid-template-areas: 
+    'header header header header header header' 
+    'left middle middle middle middle right' 
+    'footer footer footer footer footer footer';
+}
+
+.nav__links {
+  display: flex;
+}
+
+#nav__bar {
+  display: flex;
+  justify-content: space-between;
+  grid-area: header;
+}
+
+.main-wrap {
+  display: grid;
+  grid-area: middle;
 }
 
 /* Search Lists */
@@ -29,13 +63,6 @@
   padding: 12px 20px 12px 40px; /* Add some padding */
   border: 1px solid #ddd; /* Add a grey border */
   margin-bottom: 12px; /* Add some space below the input */
-}
-
-#search__list {
-  /* Remove default list styling */
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
 }
 
 #search__list li a {

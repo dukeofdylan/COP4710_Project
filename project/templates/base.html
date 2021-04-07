@@ -13,14 +13,18 @@
 </head>
 
 <body>
-    <input type="button" id="top" onclick="location.href='{% url 'home' %}';" value="Home"/>
-    {% if user.is_authenticated %}
-        <input type="button" id="top" onclick="location.href='{% url 'accounts_view' user.id %}';" value="My account"/>
-        <input type="button" id="top" onclick="location.href='{% url 'accounts_logout' %}';" value="Logout"/>
-    {% else %}
-        <input type="button" id="top" onclick="location.href='{% url 'accounts_login' %}';" value="Login"/>
-        <input type="button" id="top" onclick="location.href='{% url 'accounts_signup' %}';" value="Sign up"/>
+    <div id="grid-container">
+        <nav id="nav__bar">
+            <div class="nav__links"><a href='{% url 'home' %}'>Home</a></div>
+            {% if user.is_authenticated %}
+            <div class="nav__links"><a href='{% url 'accounts_view' user.id %}'>My account</a></div>
+            <div class="nav__links"><a href='{% url 'accounts_logout' %}'>Logout</a></div>
+            {% else %}
+            <div class="nav__links"><a href='{% url 'accounts_login' %}'>Login</a></div>
+            <div class="nav__links"><a href='{% url 'accounts_signup' %}'>Signup</a></div>
+        </nav>
     {% endif %}
     {% block content %}{% endblock content %}
+    </div>
 </body>
 </html>
