@@ -15,6 +15,7 @@ class User(AbstractUser):
     university = models.ForeignKey(
         "unievents.university", on_delete=models.DO_NOTHING, related_name="students", null=True
     )
+    admin_at: models.Manager
 
     def is_admin(self, rso_id: int):
         return bool(self.admin_at.filter(pk=rso_id))

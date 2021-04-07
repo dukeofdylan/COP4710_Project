@@ -2,5 +2,17 @@
 
 {% block content %}
     <h2>{{user.username}}'s Profile</h2>
-    <p> id: {{ user.id }}, email: {{ user.email }} </p>
+    <p>id: {{ user.id }}</p>
+    <p>Email: {{ user.email }}</p>
+    {% if user.is_superadmin %}
+        <p>User is superadmin!</p>
+    {% endif %}
+    {% if user.admin_at.all %}
+        <h3> User is admin at the following RSOs:</h3>
+    {% endif %}
+    <ul>
+    {% for rso in user.admin_at.all %}
+        <li><a href="{% url 'rso_view' rso.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+    {% endfor %}
+    </ul>
 {% endblock %}
