@@ -11,8 +11,8 @@
     
     <div class="content-wrap">
         <h3> Students </h3>
-        <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-        <ul class="search__list">
+        <input type="text" class="search__bar" id="student_input" onkeyup="searchDBEntity('student_input', 'student_list')" placeholder="Search..">
+        <ul class="search__list" id="student_list">
             {% for student in university.students.all %}
                 <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
             {% empty %}
@@ -26,8 +26,8 @@
                 </br><input type="button" onclick="location.href='{% url 'rso_create' university.university_id %}';" value="Create RSO" />
             {% endif %}
         
-        <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-        <ul class="search__list">
+        <input type="text" class="search__bar" id="rso_input" onkeyup="searchDBEntity('rso_input', 'rso_list')" placeholder="Search..">
+        <ul class="search__list" id="rso_list">
         {% for rso in university.rsos.all %}
             <li><a href="{% url 'rso_view' rso.rso_id %}">{{ rso.name }}</a></li>
         {% empty %}

@@ -26,8 +26,8 @@
         </form>
     {% endif %}
     <h3> Events </h3>
-    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul class="search__list">
+    <input type="text" class="search__bar" id="event_input" onkeyup="searchDBEntity('event_input', 'event_id')" placeholder="Search..">
+    <ul class="search__list" id="event_list">
         {% for event in rso.events.all %}
             <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
         {% empty %}

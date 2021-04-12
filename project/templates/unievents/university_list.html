@@ -7,8 +7,8 @@
         <input type="button" onclick="location.href='{% url 'universities_create' %}';" value="Create University" />
     {% endif %}
 
-    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul class="search__list">
+    <input type="text" class="search__bar" id="university_input" onkeyup="searchDBEntity('university_input', 'university_list')" placeholder="Search..">
+    <ul class="search__list" id="university_list">
     {% for uni in object_list %}
         <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
     {% empty %}
