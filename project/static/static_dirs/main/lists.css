@@ -22,23 +22,33 @@ ul li a {
 }
 
 /* List-wrap */
-}
-
-/* List-wrap */
 .list-wrap {
-  width: 30%;
   margin: 0 auto;
   overflow: hidden;
+}
+
+#nav-bar {
+  background: #333
 }
 
 #nav-bar__links {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: left;
 }
 
 #nav-bar__links li {
-  margin: 30px;
+  border-right: 1px solid #bbb;
+}
+
+#nav-bar__links li a {
+  display: block;
+  padding: 20px;
+  color: white;
+}
+
+#nav-bar__links li a:hover {
+  background-color: #111;
 }
 
 /* Search Lists */
