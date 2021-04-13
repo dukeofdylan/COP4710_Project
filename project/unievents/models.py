@@ -1,5 +1,6 @@
 # TODO: Add unique constraints
 from django.db import models
+from django.db.models import Q
 from accounts.models import User
 from multiselectfield import MultiSelectField
 
@@ -109,6 +110,7 @@ class Event(GetFieldsMixin, models.Model):
     )
     location = models.ForeignKey(Location, on_delete=models.CASCADE, blank=False, null=False)
     rso = models.ForeignKey(RSO, on_delete=models.CASCADE, related_name="events", blank=False, null=False)
+    university = models.ForeignKey(University, on_delete=models.CASCADE, related_name="events", blank=False, null=False)
     tags: "models.manager.RelatedManager"
 
     class Meta:
@@ -116,6 +118,20 @@ class Event(GetFieldsMixin, models.Model):
 
     def formatted_tags(self):
         return ", ".join(t.text for t in self.tags.all())
+
+    @classmethod
+    def safe_filter(cls, user: User, **kwargs):
+        rso_specific_query = Q()
+        for rso in user.rso_memberships.all():
+            rso_specific_query |= Q(rso_id=rso.rso_id)
+        query = (
+            Q(privacy_level=cls.PrivacyLevel.Public.value)
+            | Q(privacy_level=cls.PrivacyLevel.University_Private.value, university_id=user.university_id)
+            | rso_specific_query
+        )
+        print(rso_specific_query)
+        print(query)
+        return cls.objects.filter(query, **kwargs)
 
 
 class Comment(GetFieldsMixin, models.Model):
