@@ -8,7 +8,7 @@
   /* Responsive content */
   width: 85%;
   margin: auto;
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* List-wrap */
@@ -36,8 +36,8 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
-  height: 150px;
-  overflow-y: scroll;
+  height: 235px; /* Five lists elements at 47px ea. */
+  overflow-y: auto; /* Add scroll bar when > 5 elements */
 }
 
 .search__list li a {
