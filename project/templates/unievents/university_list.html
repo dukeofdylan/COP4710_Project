@@ -8,7 +8,7 @@
     {% endif %}
 
     <input type="text" id="uni_input" class="search__bar" onkeyup="searchDBEntity('uni_input', 'uni_list')" placeholder="Search..">
-    <ul id="uni_list" class="search__list">:
+    <ul id="uni_list" class="search__list">
     {% for uni in object_list %}
         <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
     {% empty %}
