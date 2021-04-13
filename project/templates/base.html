@@ -4,27 +4,47 @@
 <head>
     <title>RSOMaker</title>
     {% load static %}
-    <script type="text/javascript" src="{% static 'main/jquery-3.6.0.min.js' %}"></script> 
-    <script type="text/javascript" src="{% static 'main/onload.js' %}"></script> 
+    <script
+			  src="https://code.jquery.com/jquery-3.6.0.min.js"
+			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+			  crossorigin="anonymous"></script>
+    <script
+			  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+			  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+			  crossorigin="anonymous"></script>
+    <link 
+              rel="stylesheet"
+              type="text/css"
+              href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="{% static 'main/onload.js' %}"></script>
     <link rel="stylesheet" href="{% static 'main/styles.css' %}">
     <link rel="stylesheet" href="{% static 'main/lists.css' %}">
-    <meta name="viewport" content="width=device-width, initial scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     {{ form.media }}
 </head>
 
-<body>
-    <div id="grid-container">
-        <nav id="nav__bar">
-            <div class="nav__links"><a href='{% url 'home' %}'>Home</a></div>
+<body class="content-wrap">
+    <header id="nav-bar">
+        <ul id="nav-bar__links">
+    <link rel="stylesheet" href="{% static 'main/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'main/lists.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{ form.media }}
+</head>
+
+<body class="content-wrap">
+    <header id="nav-bar">
+        <ul id="nav-bar__links">
+            <li><a href='{% url 'home' %}'>Home</a></li>
             {% if user.is_authenticated %}
-            <div class="nav__links"><a href='{% url 'accounts_view' user.id %}'>My account</a></div>
-            <div class="nav__links"><a href='{% url 'accounts_logout' %}'>Logout</a></div>
+            <li><a href='{% url 'accounts_view' user.id %}'>My account</a></li>
+            <li><a href='{% url 'accounts_logout' %}'>Logout</a></li>
             {% else %}
-            <div class="nav__links"><a href='{% url 'accounts_login' %}'>Login</a></div>
-            <div class="nav__links"><a href='{% url 'accounts_signup' %}'>Signup</a></div>
-        </nav>
-    {% endif %}
+            <li><a href='{% url 'accounts_login' %}'>Login</a></li>
+            <li><a href='{% url 'accounts_signup' %}'>Signup</a></li>
+            {% endif %}
+        </ul>
+    </header>
     {% block content %}{% endblock content %}
-    </div>
 </body>
 </html>

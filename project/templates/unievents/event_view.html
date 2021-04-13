@@ -7,6 +7,7 @@
     <p>Description: {{ event.description|linebreaks }}</p>
     <p>Contact Phone: {{ event.phone }}</p>
     <p>Contact Email: {{ event.email }}</p>
+    <p>Tags: {{ event.formatted_tags }} </p>
     <p>Location: </br> <img src="{{ event.location.image.url }}" alt="Location has not loaded"/></p>
     <p>Start time: {{event.dtstart.isoformat}}</p>
     <p>End time: {{ event.dtend.isoformat }}</p>
@@ -14,10 +15,18 @@
     
     <h3> Comments </h3>
     <ul>
-        <form method="post" action="{% url 'comment_create' university.university_id rso.rso_id event.event_id %}">
+        <form method="post" action="{% url 'comment_create' event.event_id %}">
             {% csrf_token %}
             <div class="comment-container">
                 <input name="text" type="text" id="id_comment-text" required>
+                <select name="rating" class="star-rating" required>
+                    <option value="">Select a rating</option>
+                    <option value="5">Excellent</option>
+                    <option value="4">Very Good</option>
+                    <option value="3">Average</option>
+                    <option value="2">Poor</option>
+                    <option value="1">Terrible</option>
+                </select>
                 <span class="comment-time-right">{{comment.postdate.isoformat}}</span>
                 <input type="submit" value="Comment on event" />
             </div>
@@ -26,7 +35,8 @@
         {% for comment in event.comments.all %}
             <div class="comment-container">
                 <a href="{% url 'accounts_view' comment.user.id %}"> {{comment.user.username}} </a>
-                <p>{{comment.text}}</p>
+                <p>{{ comment.text }}</p>
+                <p>Rating: {{ comment.rating }}</p>
                 <span class="comment-time-right">{{comment.postdate.isoformat}}</span>
             </div>
         {% empty %}

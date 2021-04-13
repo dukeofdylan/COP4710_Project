@@ -3,19 +3,36 @@
   box-sizing: border-box;
 }
 
+<<<<<<< HEAD
 /* Remove default list styling */
 ul, li {
   list-style-type: none;
   padding: 0;
   margin: 0;
+=======
+ul {
+ list-style-type: none;
+ margin: 0;
+ padding: 0;
+}
+
+ul li a {
+  text-decoration: none;
+>>>>>>> development
 }
 
 /* Content wrap */
 .content-wrap {
   /* Responsive content */
+<<<<<<< HEAD
   width: 100%;
   margin: 0 auto;
   overflow: hidden;
+=======
+  width: 85%;
+  margin: auto;
+  overflow-y: auto;
+>>>>>>> development
 }
 
 /* List-wrap */
@@ -25,6 +42,7 @@ ul, li {
   overflow: hidden;
 }
 
+<<<<<<< HEAD
 /* Grid layout 
 ==============================================================================*/
 #grid-container {
@@ -50,10 +68,15 @@ ul, li {
 .main-wrap {
   display: grid;
   grid-area: middle;
+=======
+.nav-bar__links {
+  display: flex;
+  align-items: center;
+>>>>>>> development
 }
 
 /* Search Lists */
-#search__bar {
+.search__bar {
   background-image: url('searchicon.png'); /* Add a search icon to input */
   background-size: contain; /* Downsize search icon */
   background-position: left; /* Position the search icon */
@@ -65,17 +88,24 @@ ul, li {
   margin-bottom: 12px; /* Add some space below the input */
 }
 
+<<<<<<< HEAD
 #search__list li a {
+=======
+.search__list {
+
+}
+
+.search__list li a {
+>>>>>>> development
   border: 1px solid #ddd; /* Add a border to all links */
   margin-top: -1px; /* Prevent double borders */
   background-color: #f6f6f6; /* Grey background color */
   padding: 12px; /* Add some padding */
-  text-decoration: none; /* Remove default text underline */
   font-size: 18px; /* Increase the font-size */
   color: black; /* Add a black text color */
   display: block; /* Make it into a block element to fill the whole list */
 }
 
-#search__list li a:hover:not(.header) {
+.search__list li a:hover:not(.header) {
   background-color: #eee; /* Add a hover effect to all links, except for headers */
 }

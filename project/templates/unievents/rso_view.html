@@ -6,24 +6,35 @@
     {% comment %} student count: {{ rso.student_count }}</br> {% endcomment %}
     description: {{ rso.description|linebreaks }}</br>
     <h3> Members </h3>
-    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul id="search__list">
+    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul class="search__list">
         {% for student in rso.members.all %}
             <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
         {% empty %}
             <li>No members yet.</li>
         {% endfor %}
     </ul>
+    {% if user_can_join %}
+        <form method="post" action="{% url 'rso_join' rso.rso_id %}">
+            {% csrf_token %}
+            <input type="submit" value="Join RSO" />
+        </form>
+    {% elif user_is_already_member %}
+        <form method="post" action="{% url 'rso_leave' rso.rso_id %}">
+            {% csrf_token %}
+            <input type="submit" value="Leave RSO" />
+        </form>
+    {% endif %}
     <h3> Events </h3>
-    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul id="search__list">
+    <input type="text" class="search__bar" id="event_input" onkeyup="searchDBEntity('event_input', 'event_id')" placeholder="Search..">
+    <ul class="search__list" id="event_list">
         {% for event in rso.events.all %}
-            <li><a href="{% url 'event_view' university.university_id rso.rso_id event.event_id %}">{{ event.summary }}</a></li>
+            <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
         {% empty %}
             <li>No events yet.</li>
         {% endfor %}
     </ul>
     {% if is_admin %}
-        <input type="button" onclick="location.href='{% url 'event_create' university.university_id rso.rso_id %}';" value="Create event" />
+        <input type="button" onclick="location.href='{% url 'event_create' rso.rso_id %}';" value="Create event" />
     {% endif %}
 {% endblock %}
