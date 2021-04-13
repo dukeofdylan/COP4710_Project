@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrap">
+<<<<<<< HEAD:project/templates/unievents/rso_list.html
+    <h1>Registered Student Organizations</h1>
+    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul class="search__list">
+    {% for rso in object_list %}
+        <li><a href="{% url 'rso_view' rso.university.university_id rso.rso_id %}">{{ rso.name }}</a></li>
+=======
+    <h1>Events</h1>
+
+    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul id="search__list">
+    {% for event in filtered_events %}
+        <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
+>>>>>>> 32774722bac1143623a0f90fc9deec05cacacb2c:project/templates/unievents/event_list.html
+    {% empty %}
+        <li>No events found.</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

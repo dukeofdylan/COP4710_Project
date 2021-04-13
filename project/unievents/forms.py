@@ -154,7 +154,7 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ("location", "rso")
+        exclude = ("location", "rso", "university")
         widgets = {"freq": forms.widgets.Select(attrs=RRULE_TYPE_CHOICE_INPUT_ATTRS)}
 
     def __init__(self, *args, university_id, rso_id, **kwargs):

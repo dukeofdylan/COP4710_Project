@@ -26,9 +26,15 @@
         </form>
     {% endif %}
     <h3> Events </h3>
+<<<<<<< HEAD
+    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
+    <ul class="search__list">
+        {% for event in rso.events.all %}
+=======
     <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
     <ul id="search__list">
         {% for event in filtered_events.all %}
+>>>>>>> 32774722bac1143623a0f90fc9deec05cacacb2c
             <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
         {% empty %}
             <li>No events yet.</li>
