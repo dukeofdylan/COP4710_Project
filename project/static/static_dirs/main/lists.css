@@ -22,6 +22,9 @@ ul li a {
 }
 
 /* List-wrap */
+}
+
+/* List-wrap */
 .list-wrap {
   width: 30%;
   margin: 0 auto;
@@ -52,8 +55,12 @@ ul li a {
 }
 
 .search__list {
-  height: 200px;
-  overflow-y: auto;
+  /* Remove default list styling */
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  height: 235px; /* Five lists elements at 47px ea. */
+  overflow-y: auto; /* Add scroll bar when > 5 elements */
 }
 
 .search__list li a {

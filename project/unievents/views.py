@@ -1,6 +1,6 @@
 from typing import Any, Dict, Type, Union, cast
 from django.db import models
-from django.http.response import HttpResponseNotAllowed
+from django.http.response import Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpRequest
 from django.views.generic.detail import DetailView
@@ -112,6 +112,7 @@ class RSOView(LoginRequiredMixin, DetailView):
         # There is a liskov problem here...
         user: User = cast(User, self.request.user)
         rso: RSO = ctx["rso"]
+        ctx["filtered_events"] = Event.safe_filter(user, rso_id=rso.rso_id)
         ctx["is_admin"] = user.is_admin(rso.rso_id)
         user_is_already_member = bool(user.rso_memberships.filter(pk=rso.rso_id))
         ctx["user_is_already_member"] = user_is_already_member
@@ -119,13 +120,8 @@ class RSOView(LoginRequiredMixin, DetailView):
         return ctx
 
 
-class RSOListView(LoginRequiredMixin, ListView):
-    template_name = "unievents/rso_list.html"
-    model = RSO
-
-
-@get_by_pk_decorator(University)
 @being_a_student_required
+@get_by_pk_decorator(University)
 def create_rso_view(request, university):
     students = university.students.exclude(pk=request.user.id)
     form = CreateRSOForm(request.user, students, request.POST or None)
@@ -143,16 +139,16 @@ def create_rso_view(request, university):
 
 
 @post_requests_only
-@being_a_student_required
 @get_by_pk_decorator(RSO)
 def join_rso_view(request, rso):
-    query = get_object_or_404(request.user.rso_memberships, pk=rso.rso_id)
+    existing_rso = request.user.rso_memberships.filter(pk=rso.rso_id).first()
+    if existing_rso is not None:
+        raise PermissionError("Member of an RSO cannot join it again.")
     rso.members.add(request.user)
-    return redirect("rso_view", rso.university_id, rso.rso_id)
+    return redirect("rso_view", rso.rso_id)
 
 
 @post_requests_only
-@being_a_student_required
 @get_by_pk_decorator(RSO)
 def leave_rso_view(request, rso):
     user: User = request.user
@@ -193,6 +189,15 @@ class EventView(LoginRequiredMixin, DetailView):
     template_name = "unievents/event_view.html"
     model = Event
 
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        event: Event = self.get_object()
+        if (event.privacy_level == Event.PrivacyLevel.RSO_Private and not event.rso in user.rso_memberships.all()) or (
+            event.privacy_level == Event.PrivacyLevel.University_Private and user.university_id != event.university_id
+        ):
+            raise Http404()
+        return super().get(request, *args, **kwargs)
+
 
 @post_requests_only
 @get_by_pk_decorator(Event)
@@ -204,3 +209,10 @@ def create_comment_view(request, event):
         rating=request.POST["rating"],
     ).save()
     return redirect("event_view", event.event_id)
+
+
+@login_required()
+def event_list_view(request):
+    user: User = request.user
+    context = {"filtered_events": Event.safe_filter(user)}
+    return render(request, "unievents/event_list.html", context)

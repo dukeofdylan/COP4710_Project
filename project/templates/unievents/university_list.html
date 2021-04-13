@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="main-wrap">
+<div class="content-wrap">
     <h1>Universities</h1>
     {% if user.is_superadmin %}
         <input type="button" onclick="location.href='{% url 'universities_create' %}';" value="Create University" />
     {% endif %}
 
-    <input type="text" class="search__bar" id="university_input" onkeyup="searchDBEntity('university_input', 'university_list')" placeholder="Search..">
-    <ul class="search__list" id="university_list">
+    <input type="text" id="uni_input" class="search__bar" onkeyup="searchDBEntity('uni_input', 'uni_list')" placeholder="Search..">
+    <ul id="uni_list" class="search__list">:
     {% for uni in object_list %}
         <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
     {% empty %}

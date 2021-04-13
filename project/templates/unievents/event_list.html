@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrap">
+    <h1>Events</h1>
+
+    <input type="text" id="events_input" class="search__bar" onkeyup="searchDBEntity('events_input', 'events_list')" placeholder="Search..">
+    <ul id="events_list" class="search__list">
+    {% for event in filtered_events %}
+        <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
+    {% empty %}
+        <li>No events found.</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}
