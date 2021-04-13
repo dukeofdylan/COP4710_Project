@@ -28,9 +28,14 @@ ul li a {
   overflow: hidden;
 }
 
-.nav-bar__links {
+#nav-bar__links {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+#nav-bar__links li {
+  margin: 30px;
 }
 
 /* Search Lists */
@@ -48,7 +53,7 @@ ul li a {
 
 .search__list {
   height: 200px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .search__list li a {
