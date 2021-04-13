@@ -26,15 +26,6 @@
 <body class="content-wrap">
     <header id="nav-bar">
         <ul id="nav-bar__links">
-    <link rel="stylesheet" href="{% static 'main/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'main/lists.css' %}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{ form.media }}
-</head>
-
-<body class="content-wrap">
-    <header id="nav-bar">
-        <ul id="nav-bar__links">
             <li><a href='{% url 'home' %}'>Home</a></li>
             {% if user.is_authenticated %}
             <li><a href='{% url 'accounts_view' user.id %}'>My account</a></li>
