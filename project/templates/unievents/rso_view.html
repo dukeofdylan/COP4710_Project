@@ -6,8 +6,8 @@
     {% comment %} student count: {{ rso.student_count }}</br> {% endcomment %}
     description: {{ rso.description|linebreaks }}</br>
     <h3> Members </h3>
-    <input type="text" class="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul class="search__list">
+    <input type="text" id="members_input" class="search__bar" onkeyup="searchDBEntity('members_input', 'members_list')" placeholder="Search..">
+    <ul id="members_list" class="search__list">
         {% for student in rso.members.all %}
             <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
         {% empty %}
@@ -26,8 +26,8 @@
         </form>
     {% endif %}
     <h3> Events </h3>
-    <input type="text" id="search__bar" onkeyup="searchFunction()" placeholder="Search..">
-    <ul id="search__list">
+    <input type="text" id="event_input" class="search__bar" onkeyup="searchDBEntity('event_input','event_list')" placeholder="Search..">
+    <ul id="event_list" class="search__list">
         {% for event in filtered_events.all %}
             <li><a href="{% url 'event_view' event.event_id %}">{{ event.summary }}</a></li>
         {% empty %}
