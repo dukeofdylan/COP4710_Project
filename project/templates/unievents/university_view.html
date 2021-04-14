@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% include "base.html" %}
 
 {% block content %}
     <h2>{{university.name}}</h2>
-    id: {{ university.university_id }}</br>
+    id: {{ university.id }}</br>
     email_domain: {{ university.email_domain }}</br>
     student count: {{ university.student_count }}</br>
     description: {{ university.description|linebreaks }}</br>
@@ -22,14 +22,14 @@
     </div>
     <div class="content-wrap">
         <h3>Registered Student Organizations</h1>
-        {% if user.is_authenticated and user.university_id == university.university_id %}
-                </br><input type="button" onclick="location.href='{% url 'rso_create' university.university_id %}';" value="Create RSO" />
+        {% if user.is_authenticated and user.university.id == university.id %}
+                </br><input type="button" onclick="location.href='{% url 'rso_create' university.id %}';" value="Create RSO" />
             {% endif %}
         
         <input type="text" id="rso_search" class="search__bar" onkeyup="searchDBEntity('rso_search', 'rso_list')" placeholder="Search..">
         <ul id="rso_list" class="search__list">
         {% for rso in university.rsos.all %}
-            <li><a href="{% url 'rso_view' rso.rso_id %}">{{ rso.name }}</a></li>
+            <li><a href="{% url 'rso_view' rso.id %}">{{ rso.name }}</a></li>
         {% empty %}
             <li>No organizations registered yet.</li>
         {% endfor %}

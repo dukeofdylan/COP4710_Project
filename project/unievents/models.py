@@ -13,7 +13,7 @@ class GetFieldsMixin:
 
 
 class Location(GetFieldsMixin, models.Model):
-    location_id = models.AutoField(db_column="location_id", primary_key=True)
+    id = models.AutoField(db_column="location_id", primary_key=True)
     longitude = models.FloatField(db_column="longitude", blank=False, null=False)
     latitude = models.FloatField(db_column="latitude", blank=False, null=False)
     image = models.ImageField(db_column="image", blank=False, null=False)
@@ -28,9 +28,9 @@ def uni_image_upload_to(instance, filename):
 
 
 class University(GetFieldsMixin, models.Model):
-    university_id = models.AutoField(db_column="university_id", primary_key=True)
+    id = models.AutoField(db_column="university_id", primary_key=True)
     # TODO: make it a view or make a trigger for it
-    student_count = models.IntegerField(db_column="student_count", blank=True, null=False)
+    student_count = models.IntegerField(db_column="student_count", blank=True, null=False, default=0)
     name = models.TextField(db_column="name", blank=False, null=False)
     description = models.TextField(db_column="description", blank=True, null=False, default="")
     avatar_image = models.ImageField(db_column="avatar_image", blank=False, null=False, upload_to=uni_image_upload_to)
@@ -44,7 +44,7 @@ class University(GetFieldsMixin, models.Model):
 
 
 class RSO(GetFieldsMixin, models.Model):
-    rso_id = models.AutoField(db_column="rso_id", primary_key=True)
+    id = models.AutoField(db_column="rso_id", primary_key=True)
     name = models.TextField(db_column="name", blank=False, null=False)
     description = models.TextField(db_column="description", blank=True, null=False, default="")
     admin = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False, related_name="admin_at")
@@ -78,7 +78,7 @@ class Event(GetFieldsMixin, models.Model):
         Saturday = "SA"
         Sunday = "SU"
 
-    event_id = models.AutoField(db_column="event_id", primary_key=True)
+    id = models.AutoField(db_column="event_id", primary_key=True)
     summary = models.TextField(db_column="summary")
     privacy_level = models.IntegerField(
         db_column="privacy_level",
@@ -95,7 +95,7 @@ class Event(GetFieldsMixin, models.Model):
     freq = models.TextField(
         db_column="freq",
         null=False,
-        blank=True,
+        blank=False,
         choices=Frequency.choices,
         default=Frequency.Once,
         verbose_name="frequency",
@@ -123,7 +123,7 @@ class Event(GetFieldsMixin, models.Model):
     def safe_filter(cls, user: User, **kwargs):
         rso_specific_query = Q()
         for rso in user.rso_memberships.all():
-            rso_specific_query |= Q(rso_id=rso.rso_id)
+            rso_specific_query |= Q(rso_id=rso.id)
         query = (
             Q(privacy_level=cls.PrivacyLevel.Public.value)
             | Q(privacy_level=cls.PrivacyLevel.University_Private.value, university_id=user.university_id)
@@ -142,7 +142,7 @@ class Comment(GetFieldsMixin, models.Model):
         Poor = 2
         Terrible = 1
 
-    comment_id = models.AutoField(db_column="comment_id", primary_key=True)
+    id = models.AutoField(db_column="comment_id", primary_key=True)
     postdate = models.DateTimeField(db_column="postdate", auto_now_add=True, blank=False, null=False)
     text = models.TextField(db_column="text", blank=False, null=False)
     rating = models.IntegerField(db_column="rating", blank=False, null=False, choices=Rating.choices)
@@ -153,10 +153,10 @@ class Comment(GetFieldsMixin, models.Model):
         db_table = "comment"
 
 
-class Event_tag(GetFieldsMixin, models.Model):
-    event_tag_id = models.AutoField(db_column="event_tag_id", primary_key=True)
+class Tag(GetFieldsMixin, models.Model):
+    id = models.AutoField(db_column="tag_id", primary_key=True)
     text = models.TextField(db_column="text", blank=False, null=False)
     events = models.ManyToManyField(Event, related_name="tags", blank=False)
 
     class Meta:
-        db_table = "event_tag"
+        db_table = "tag"

@@ -1,16 +1,19 @@
 from typing import Any, Dict, Type, Union, cast
 from django.db import models
+from django.forms.models import inlineformset_factory
 from django.http.response import Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpRequest
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from accounts.views import login_required, super_admin_required
+from accounts.views import SuperAdminRequiredMixin, login_required, super_admin_required
 from accounts.models import User
 from unievents.forms import CreateEventForm, CreateLocationForm, CreateRSOForm, CreateUniversityForm
 from django.core.exceptions import PermissionDenied
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
 
-from unievents.models import Comment, Event, Event_tag, RSO, University
+from unievents.models import Comment, Event, Location, Tag, RSO, University
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -42,22 +45,22 @@ def post_requests_only(func):
     return inner
 
 
-def add_to_context_decorator(**models: Type[models.Model]):
-    """ @decorator(model1, model2, model3_pk_name=model3, ...) """
+# def add_to_context_decorator(**models: Type[models.Model]):
+#     """ @decorator(model1, model2, model3_pk_name=model3, ...) """
 
-    def arghandler(cls: Union[Type[DetailView], Type[ListView]]):
-        original_get_context_data = cls.get_context_data
+#     def arghandler(cls: Union[Type[DetailView], Type[ListView]]):
+#         original_get_context_data = cls.get_context_data
 
-        def inner(self, **kwargs: Any) -> Any:
-            context = original_get_context_data(self, **kwargs)
-            for kwargname, model in models.items():
-                context[model._meta.db_table] = get_object_or_404(model, pk=self.kwargs[kwargname])
-            return context
+#         def inner(self, **kwargs: Any) -> Any:
+#             context = original_get_context_data(self, **kwargs)
+#             for kwargname, model in models.items():
+#                 context[model._meta.db_table] = get_object_or_404(model, pk=self.kwargs[kwargname])
+#             return context
 
-        cls.get_context_data = inner
-        return cls
+#         cls.get_context_data = inner
+#         return cls
 
-    return arghandler
+#     return arghandler
 
 
 def get_by_pk_decorator(model: Type[models.Model]):
@@ -75,22 +78,13 @@ def home_view(request: HttpRequest):
     return render(request, "unievents/home.html")
 
 
-@super_admin_required()
-def create_university_view(request):
-    university_form = CreateUniversityForm(request.POST or None, request.FILES or None)
-    location_form = CreateLocationForm(request.POST or None)
-    context = {"university_form": university_form, "location_form": location_form}
-    if request.method == "GET":
-        return render(request, "unievents/university_create.html", context)
-    elif request.method == "POST":
-        if university_form.is_valid() and location_form.is_valid():
-            location = location_form.save()
-            university = university_form.save(location)
-            return redirect("university_view", university.university_id)
-        else:
-            return render(request, "unievents/university_create.html", context)
-    else:
-        return render(request, "unievents/university_create.html", context)
+class CreateUniversityView(SuperAdminRequiredMixin, CreateView):
+    model = University
+    form_class = CreateUniversityForm
+    template_name = "unievents/university_create.html"
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("universities_view", args=(self.object.id,))
 
 
 class UniversityView(LoginRequiredMixin, DetailView):
@@ -112,9 +106,9 @@ class RSOView(LoginRequiredMixin, DetailView):
         # There is a liskov problem here...
         user: User = cast(User, self.request.user)
         rso: RSO = ctx["rso"]
-        ctx["filtered_events"] = Event.safe_filter(user, rso_id=rso.rso_id)
-        ctx["is_admin"] = user.is_admin(rso.rso_id)
-        user_is_already_member = bool(user.rso_memberships.filter(pk=rso.rso_id))
+        ctx["filtered_events"] = Event.safe_filter(user, rso_id=rso.id)
+        ctx["is_admin"] = user.is_admin(rso.id)
+        user_is_already_member = bool(user.rso_memberships.filter(pk=rso.id))
         ctx["user_is_already_member"] = user_is_already_member
         ctx["user_can_join"] = user.university == rso.university and not user_is_already_member
         return ctx
@@ -131,7 +125,7 @@ def create_rso_view(request, university):
     elif request.method == "POST":
         if form.is_valid():
             rso = form.save()
-            return redirect("rso_view", rso.rso_id)
+            return redirect("rso_view", rso.id)
         else:
             return render(request, "unievents/rso_create.html", context)
     else:
@@ -141,44 +135,41 @@ def create_rso_view(request, university):
 @post_requests_only
 @get_by_pk_decorator(RSO)
 def join_rso_view(request, rso):
-    existing_rso = request.user.rso_memberships.filter(pk=rso.rso_id).first()
+    existing_rso = request.user.rso_memberships.filter(pk=rso.id).first()
     if existing_rso is not None:
         raise PermissionError("Member of an RSO cannot join it again.")
     rso.members.add(request.user)
-    return redirect("rso_view", rso.rso_id)
+    return redirect("rso_view", rso.id)
 
 
 @post_requests_only
 @get_by_pk_decorator(RSO)
 def leave_rso_view(request, rso):
     user: User = request.user
-    if user.is_admin(rso.rso_id):
+    if user.is_admin(rso.id):
         raise PermissionError("Admin of an RSO cannot leave it.")
     # Only RSO members can leave it
-    get_object_or_404(user.rso_memberships, pk=rso.rso_id)
+    get_object_or_404(user.rso_memberships, pk=rso.id)
     user.rso_memberships.remove(rso)
-    return redirect("rso_view", rso.rso_id)
+    return redirect("rso_view", rso.id)
 
 
 @being_an_admin_required
 @get_by_pk_decorator(RSO)
 def create_event_view(request, rso):
-    event_form = CreateEventForm(request.POST or None, university_id=rso.university_id, rso_id=rso.rso_id)
-    location_form = CreateLocationForm(request.POST or None)
+    form = CreateEventForm(rso.university_id, rso.id, request.POST or None)
     context = {
-        "event_form": event_form,
-        "location_form": location_form,
-        "is_admin": request.user.is_admin(rso.rso_id),
+        "form": form,
+        "is_admin": request.user.is_admin(rso.id),
         "rso": rso,
-        "possible_tags": Event_tag.objects.all(),
+        "possible_tags": Tag.objects.all(),
     }
     if request.method == "GET":
         return render(request, "unievents/event_create.html", context)
     elif request.method == "POST":
-        if event_form.is_valid() and location_form.is_valid():
-            location = location_form.save()
-            event = event_form.save(location)
-            return redirect("event_view", event.event_id)
+        if form.is_valid():
+            event = form.save()
+            return redirect("event_view", event.id)
         else:
             return render(request, "unievents/event_create.html", context)
     else:
@@ -203,12 +194,12 @@ class EventView(LoginRequiredMixin, DetailView):
 @get_by_pk_decorator(Event)
 def create_comment_view(request, event):
     Comment(
-        event_id=event.event_id,
+        event_id=event.id,
         user_id=request.user.id,
         text=request.POST["text"],
         rating=request.POST["rating"],
     ).save()
-    return redirect("event_view", event.event_id)
+    return redirect("event_view", event.id)
 
 
 @login_required()

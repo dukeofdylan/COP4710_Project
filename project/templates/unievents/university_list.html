@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% include "base.html" %}
 
 {% block content %}
 <div class="content-wrap">
@@ -10,7 +10,7 @@
     <input type="text" id="uni_input" class="search__bar" onkeyup="searchDBEntity('uni_input', 'uni_list')" placeholder="Search..">
     <ul id="uni_list" class="search__list">
     {% for uni in object_list %}
-        <li><a href="{% url 'universities_view' uni.university_id %}">{{ uni.name }}</a></li>
+        <li><a href="{% url 'universities_view' uni.id %}">{{ uni.name }}</a></li>
     {% empty %}
         <li>No universities found.</li>
     {% endfor %}
