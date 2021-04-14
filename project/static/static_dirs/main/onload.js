@@ -1,9 +1,9 @@
-function searchFunction() {
+function searchDBEntity(input_id, input_list) {
   // Declare variables
   var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('search__bar');
+  input = document.getElementById(input_id);
   filter = input.value.toUpperCase();
-  ul = document.getElementById("search__list");
+  ul = document.getElementById(input_list);
   li = ul.getElementsByTagName('li');
   
   // Loop through all list items, and hide those who don't match the search query
