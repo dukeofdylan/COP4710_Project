@@ -22,8 +22,7 @@ def super_admin_required(login_url=default_login_url):
         @login_required(login_url=login_url)
         def inner(request, *args, **kwargs):
             if not request.user.is_superadmin:
-                # TODO: Make an error message
-                return redirect("home")
+                raise PermissionDenied("Superadmin privileges required to view this page.")
             return func(request, *args, **kwargs)
 
         return inner

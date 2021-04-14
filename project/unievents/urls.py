@@ -23,17 +23,17 @@ from unievents.views import (
     create_event_view,
     create_rso_view,
     home_view,
-    create_university_view,
     join_rso_view,
     leave_rso_view,
     event_list_view,
+    CreateUniversityView,
 )
 from django.views.generic import RedirectView
 
 urlpatterns = [
     path("", RedirectView.as_view(pattern_name="home")),
     path("home", home_view, name="home"),
-    path("universities/create", create_university_view, name="universities_create"),
+    path("universities/create", CreateUniversityView.as_view(), name="universities_create"),
     path("universities/list", UniversityListView.as_view(), name="universities_list"),
     path("universities/<pk>/", UniversityView.as_view(), name="universities_view"),
     path("rso/<university_id>/create", create_rso_view, name="rso_create"),
