@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
+from django.db.models.fields import AutoField
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -161,3 +163,4 @@ MAP_WIDGETS = {
 }
 
 LOGIN_REDIRECT_URL = "home"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

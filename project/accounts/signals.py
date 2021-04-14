@@ -13,7 +13,7 @@ def user_post_save(sender, instance, created: bool, update_fields, *args, **kwar
         if unis:
             uni = unis[0]
             with transaction.atomic():
-                instance.university_id = uni.university_id
+                instance.university_id = uni.id
                 instance.save()
                 uni.student_count += 1
                 uni.save()
