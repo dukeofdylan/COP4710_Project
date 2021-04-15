@@ -1,0 +1,30 @@
+
+
+#toTopLeft {
+    position:   absolute;
+    top:        5px;
+    left:       5px;
+    text-align: left;
+}
+
+/* Chat containers */
+.comment-container {
+   border: 2px solid #ffffff;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  /* Clear floats */
+  .comment-container::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  /* Style time text */
+  .comment-time-right {
+    float: right;
+    color: #aaa;
+  }

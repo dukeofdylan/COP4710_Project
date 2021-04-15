@@ -5,8 +5,17 @@ name = "pypi"
 
 [packages]
 django = "*"
+pillow = "*"
+django-map-widgets = "*"
+six = "*"
+requests = "*"
+django-multiselectfield = "*"
+django-stubs = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
-python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true

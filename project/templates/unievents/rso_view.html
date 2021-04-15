@@ -1,0 +1,40 @@
+{% include "base.html" %}
+
+{% block content %}
+    <h2>{{rso.name}}</h2>
+    id: {{ rso.id }}</br>
+    {% comment %} student count: {{ rso.student_count }}</br> {% endcomment %}
+    description: {{ rso.description|linebreaks }}</br>
+    <h3> Members </h3>
+    <input type="text" id="members_input" class="search__bar" onkeyup="searchDBEntity('members_input', 'members_list')" placeholder="Search..">
+    <ul id="members_list" class="search__list">
+        {% for student in rso.members.all %}
+            <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
+        {% empty %}
+            <li>No members yet.</li>
+        {% endfor %}
+    </ul>
+    {% if user_can_join %}
+        <form method="post" action="{% url 'rso_join' rso.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Join RSO" />
+        </form>
+    {% elif user_is_already_member %}
+        <form method="post" action="{% url 'rso_leave' rso.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Leave RSO" />
+        </form>
+    {% endif %}
+    <h3> Events </h3>
+    <input type="text" id="event_input" class="search__bar" onkeyup="searchDBEntity('event_input','event_list')" placeholder="Search..">
+    <ul id="event_list" class="search__list">
+        {% for event in filtered_events.all %}
+            <li><a href="{% url 'event_view' event.id %}">{{ event.summary }}</a></li>
+        {% empty %}
+            <li>No events yet.</li>
+        {% endfor %}
+    </ul>
+    {% if is_admin %}
+        <input type="button" onclick="location.href='{% url 'event_create' rso.id %}';" value="Create event" />
+    {% endif %}
+{% endblock %}
