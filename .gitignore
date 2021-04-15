@@ -1,1 +1,3 @@
 **/node_modules/*
+**/__pycache__/*
+project/db.sqlite3

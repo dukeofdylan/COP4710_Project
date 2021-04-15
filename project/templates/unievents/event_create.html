@@ -1,0 +1,64 @@
+{% include "base.html" %}
+
+{% block content %}
+{{ form.media }}
+<form method="post" action="{% url 'event_create' rso.id %}">
+    {% csrf_token %}
+    {{ form.location_form.as_p }}
+    {{ form.summary.errors }}
+    <p>{{ form.summary.label_tag }} {{ form.summary }}</p>
+    {{ form.privacy_level.errors }}
+    <p>{{ form.privacy_level.label_tag }} {{ form.privacy_level }}</p>
+    {{ form.description.errors }}
+    <p>{{ form.description.label_tag }} {{ form.description }}</p>
+    {{ form.phone.errors }}
+    <p>{{ form.phone.label_tag }} {{ form.phone }}</p>
+    {{ form.email.errors }}
+    <p>{{ form.email.label_tag }} {{ form.email }}</p>
+    {{ form.tags.errors }}
+    <p>{{ form.tags.label_tag }} {{ form.tags }}</p>
+    {% comment %} HERE'S HOW YOU ITERATE OVER TAGS {% endcomment %}
+    <div hidden>
+        {% for tag in possible_tags %}
+            <p>{{tag.text}}</p>
+        {% endfor %}
+    </div>
+    {{ form.dtstart.errors }}
+    <p>{{ form.dtstart.label_tag }} {{ form.dtstart }}</p>
+    {{ form.dtend.errors }}
+    <p>{{ form.dtend.label_tag }} {{ form.dtend }}</p>
+    {{ form.freq.errors }}
+    <p>{{ form.freq.label_tag }} {{ form.freq }}</p>
+        {{ form.non_field_errors }}
+    <div class="until-input">
+        {{ form.until.errors }}
+        <p>{{ form.until.label_tag }} {{ form.until }}</p>
+    </div>
+    <div class="byday-input">
+        {{ form.byday.errors }}
+        <p>{{ form.byday.label_tag }} {{ form.byday }}</p>
+    </div>
+    <input type="submit" value="Create Event" />
+</form>
+<script>
+    function onRRULETypeChoiceChange() {
+        let type = jQuery('.rrule-type-choice-input').val()
+        if (type == "WEEKLY") {
+            jQuery('.byday-input').show()
+            jQuery('.until-input').show()
+        }
+        else if (type == "DAILY") {
+            jQuery('.byday-input').hide()
+            jQuery('.until-input').show()
+        }
+        else {
+            jQuery('.byday-input').hide()
+            jQuery('.until-input').hide()
+        }
+    }
+    jQuery(document).ready(function () {
+        onRRULETypeChoiceChange()
+        jQuery('.rrule-type-choice-input').change(onRRULETypeChoiceChange)
+    });
+</script>
+{% endblock %}

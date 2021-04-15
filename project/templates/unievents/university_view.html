@@ -1,0 +1,38 @@
+{% include "base.html" %}
+
+{% block content %}
+    <h2>{{university.name}}</h2>
+    id: {{ university.id }}</br>
+    email_domain: {{ university.email_domain }}</br>
+    student count: {{ university.student_count }}</br>
+    description: {{ university.description|linebreaks }}</br>
+    Location: </br> <img src="{{ university.location.image.url }}" alt="Location has not loaded"/></br> 
+    Avatar: </br><img style="width:100%;max-width:200px;" src="{{ university.avatar_image.url }}" alt="Avatar has not loaded"/>
+    
+    <div class="content-wrap">
+        <h3> Students </h3>
+        <input type="text" id="student_search" class="search__bar" onkeyup="searchDBEntity('student_search','student_list')" placeholder="Search..">
+        <ul id="student_list" class="search__list">
+            {% for student in university.students.all %}
+                <li><a href="{% url 'accounts_view' student.id %}">{{ student.username }}</a></li>
+            {% empty %}
+                <li>No students registered yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="content-wrap">
+        <h3>Registered Student Organizations</h1>
+        {% if user.is_authenticated and user.university.id == university.id %}
+                </br><input type="button" onclick="location.href='{% url 'rso_create' university.id %}';" value="Create RSO" />
+            {% endif %}
+        
+        <input type="text" id="rso_search" class="search__bar" onkeyup="searchDBEntity('rso_search', 'rso_list')" placeholder="Search..">
+        <ul id="rso_list" class="search__list">
+        {% for rso in university.rsos.all %}
+            <li><a href="{% url 'rso_view' rso.id %}">{{ rso.name }}</a></li>
+        {% empty %}
+            <li>No organizations registered yet.</li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
